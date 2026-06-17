@@ -1,9 +1,10 @@
 #!/bin/bash
-# Hook: đóng gói Medilab (AKSOFT) — app .NET 8 WPF chạy qua Wine.
-# Build-time: tải bộ cài + .NET runtime vào ISO, cài script + launcher.
-# First-run (máy người dùng): medilab-install dựng Wine prefix, cài runtime/font/app.
+# Hook: cài sẵn Medilab (AKSOFT) + .NET 8 Desktop Runtime vào OS qua Wine.
+# Build-time: tải bộ cài, dựng SẴN Wine prefix (Xvfb headless) tại /opt/medilab/wineprefix.
+# First-run: copy prefix-template sang home người dùng (đã cài sẵn). Dự phòng: cài lại.
 export DEBIAN_FRONTEND=noninteractive
-echo "[SenOS] === Đóng gói Medilab (AKSOFT) ==="
+
+echo "[SenOS] === Cài sẵn Medilab (AKSOFT) vào OS ==="
 
 MDIR=/opt/medilab
 INST="$MDIR/installers"
@@ -18,95 +19,123 @@ echo "[Medilab] Tải .NET 8 Desktop Runtime (~56MB)..."
 wget -q -O "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" "$DOTNET_URL" || echo "[WARN] tải .NET runtime thất bại"
 ls -lh "$INST" || true
 
-# --- Script cài đặt lần đầu (chạy trong phiên người dùng, có Wine + màn hình) ---
+# ---------------------------------------------------------------------------
+# CÀI SẴN LÚC BUILD: Wine không chạy bằng root -> dùng user tạm + Xvfb headless.
+# ---------------------------------------------------------------------------
+echo "[Medilab] Cài Xvfb + dựng Wine prefix sẵn (best-effort, có timeout)..."
+apt-get install -y --no-install-recommends xvfb >/dev/null 2>&1 || echo "[WARN] không cài được xvfb"
+
+BUSER=winebld
+id "$BUSER" >/dev/null 2>&1 || useradd -m -s /bin/bash "$BUSER"
+mkdir -p "$MDIR/wineprefix"
+chown -R "$BUSER:$BUSER" "$MDIR"
+
+cat > /tmp/medilab-buildinstall.sh <<'BUILDINSTALL'
+#!/bin/bash
+export WINEPREFIX=/opt/medilab/wineprefix
+export WINEARCH=win64
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES="mscoree=d;mshtml=d"
+export DISPLAY=
+echo "  -> wineboot init"
+timeout 300 xvfb-run -a wineboot -u >/dev/null 2>&1 || true
+mkdir -p "$WINEPREFIX/drive_c/windows/Fonts"
+echo "  -> copy fonts"
+find /usr/share/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
+    -exec cp -f {} "$WINEPREFIX/drive_c/windows/Fonts/" \; 2>/dev/null || true
+echo "  -> install .NET 8 desktop runtime"
+timeout 600 xvfb-run -a wine /opt/medilab/installers/windowsdesktop-runtime-8.0.28-win-x64.exe /install /quiet /norestart >/dev/null 2>&1 || true
+echo "  -> install Medilab (silent)"
+timeout 900 xvfb-run -a wine /opt/medilab/installers/Setup.exe /exenoui /qn >/dev/null 2>&1 || true
+echo "  -> build-time install done"
+BUILDINSTALL
+chmod +x /tmp/medilab-buildinstall.sh
+chown "$BUSER:$BUSER" /tmp/medilab-buildinstall.sh
+runuser -u "$BUSER" -- /tmp/medilab-buildinstall.sh || true
+rm -f /tmp/medilab-buildinstall.sh
+
+# Giữ prefix làm template (root sở hữu) để copy sang từng user.
+chown -R root:root "$MDIR"
+userdel -r "$BUSER" 2>/dev/null || true
+
+if find "$MDIR/wineprefix" -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
+    echo "[OK] Đã cài sẵn Medilab vào prefix template."
+else
+    echo "[WARN] Cài sẵn lúc build chưa thấy Medilab.exe — sẽ cài lại khi mở lần đầu."
+fi
+
+# --- Script cài đặt lần đầu (dự phòng / cài lại) ---
 cat > /usr/local/bin/medilab-install <<'INSTALL'
 #!/bin/bash
-# Cài Medilab qua Wine cho user hiện tại.
 set -u
 INST=/opt/medilab/installers
 export WINEPREFIX="$HOME/.local/share/medilab/wine"
 export WINEARCH=win64
 export WINEDEBUG=-all
-
 echo "================ Cài đặt Medilab (AKSOFT) ================"
-echo "Môi trường: Wine + .NET 8 Desktop Runtime"
 mkdir -p "$WINEPREFIX"
-
-echo "[1/4] Khởi tạo Wine prefix (lần đầu mất 1-2 phút)..."
-wineboot -u >/dev/null 2>&1 || wineboot -i >/dev/null 2>&1 || true
-
-echo "[2/4] Cài bộ font cho Medilab..."
+echo "[1/4] Khởi tạo Wine prefix..."
+wineboot -u >/dev/null 2>&1 || true
+echo "[2/4] Cài font..."
 mkdir -p "$WINEPREFIX/drive_c/windows/Fonts"
-# Copy font hệ thống (gồm Be Vietnam Pro, Noto, DejaVu...) vào prefix
-find /usr/share/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
-    -exec cp -f {} "$WINEPREFIX/drive_c/windows/Fonts/" \; 2>/dev/null || true
-# Font Windows core (Times New Roman, Arial, Tahoma...) nếu có mạng
+find /usr/share/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) -exec cp -f {} "$WINEPREFIX/drive_c/windows/Fonts/" \; 2>/dev/null || true
 command -v winetricks >/dev/null 2>&1 && winetricks -q corefonts >/dev/null 2>&1 || true
-
-echo "[3/4] Cài .NET 8 Desktop Runtime (qua Wine)..."
-if [ -f "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" ]; then
-    wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" /install /quiet /norestart 2>/dev/null \
-        || wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" 2>/dev/null || true
-fi
-
+echo "[3/4] Cài .NET 8 Desktop Runtime..."
+[ -f "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" ] && \
+  { wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" /install /quiet /norestart 2>/dev/null || wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" 2>/dev/null || true; }
 echo "[4/4] Cài Medilab..."
-if [ -f "$INST/Setup.exe" ]; then
-    # Advanced Installer: thử im lặng, không được thì mở GUI cài
-    wine "$INST/Setup.exe" /exenoui /qn 2>/dev/null || wine "$INST/Setup.exe" 2>/dev/null || true
-fi
-
-echo "Hoàn tất. Mở Medilab từ menu hoặc icon trên Desktop."
-command -v notify-send >/dev/null 2>&1 && notify-send "Medilab" "Cài đặt xong. Mở Medilab từ Desktop." || true
+[ -f "$INST/Setup.exe" ] && { wine "$INST/Setup.exe" /exenoui /qn 2>/dev/null || wine "$INST/Setup.exe" 2>/dev/null || true; }
+echo "Hoàn tất."
+command -v notify-send >/dev/null 2>&1 && notify-send "Medilab" "Cài đặt xong." || true
 read -p "Nhấn Enter để đóng..." _ 2>/dev/null || true
 INSTALL
 chmod +x /usr/local/bin/medilab-install
 
-# --- Script chạy Medilab (tự cài nếu chưa có) ---
+# --- Script chạy Medilab (dùng prefix cài sẵn nếu có) ---
 cat > /usr/local/bin/medilab-run <<'RUN'
 #!/bin/bash
-export WINEPREFIX="$HOME/.local/share/medilab/wine"
 export WINEDEBUG=-all
-EXE=$(find "$WINEPREFIX/drive_c" -iname 'Medilab.exe' 2>/dev/null | head -1)
-if [ -z "$EXE" ]; then
-    # Chưa cài -> chạy trình cài đặt trong terminal
-    exec x-terminal-emulator -e /usr/local/bin/medilab-install 2>/dev/null \
-        || exec gnome-terminal -- /usr/local/bin/medilab-install 2>/dev/null \
-        || /usr/local/bin/medilab-install
+UPREFIX="$HOME/.local/share/medilab/wine"
+# Lần đầu: nếu có prefix-template đã cài sẵn lúc build -> copy sang home (nhanh)
+if [ ! -d "$UPREFIX" ] && [ -d /opt/medilab/wineprefix ] && find /opt/medilab/wineprefix -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
+    mkdir -p "$(dirname "$UPREFIX")"
+    cp -a /opt/medilab/wineprefix "$UPREFIX"
 fi
-exec wine "$EXE"
+export WINEPREFIX="$UPREFIX"
+EXE=$(find "$UPREFIX" -iname 'Medilab.exe' 2>/dev/null | head -1)
+if [ -z "$EXE" ]; then
+    x-terminal-emulator -e /usr/local/bin/medilab-install 2>/dev/null || gnome-terminal -- /usr/local/bin/medilab-install 2>/dev/null || /usr/local/bin/medilab-install
+    EXE=$(find "$UPREFIX" -iname 'Medilab.exe' 2>/dev/null | head -1)
+fi
+[ -n "$EXE" ] && exec wine "$EXE"
 RUN
 chmod +x /usr/local/bin/medilab-run
 
-# --- Desktop launchers ---
+# --- Desktop launchers + icon ---
 cat > /usr/share/applications/medilab.desktop <<'DESK'
 [Desktop Entry]
 Type=Application
 Name=Medilab
-Name[vi]=Medilab
 Comment=Phần mềm Medilab (AKSOFT) — chạy qua Wine
-Comment[vi]=Phần mềm Medilab (AKSOFT) — chạy qua Wine
 Exec=/usr/local/bin/medilab-run
 Icon=senos-logo
 Terminal=false
 Categories=Office;Science;
 StartupNotify=true
 DESK
-
 cat > /usr/share/applications/medilab-install.desktop <<'DESK2'
 [Desktop Entry]
 Type=Application
-Name=Cài đặt Medilab
-Comment=Cài/cài lại Medilab qua Wine (.NET 8 + font)
+Name=Cài đặt lại Medilab
+Comment=Cài/cài lại Medilab qua Wine
 Exec=/usr/local/bin/medilab-install
 Icon=senos-logo
 Terminal=true
 Categories=System;
 DESK2
-
-# --- Icon Medilab trên Desktop cho user mặc định ---
 mkdir -p /etc/skel/Desktop
 cp -f /usr/share/applications/medilab.desktop /etc/skel/Desktop/medilab.desktop
 chmod +x /etc/skel/Desktop/medilab.desktop
 gio set /etc/skel/Desktop/medilab.desktop metadata::trusted true 2>/dev/null || true
 
-echo "[OK] Đóng gói Medilab xong (bộ cài tại $INST, cài lần đầu khi mở Medilab)."
+echo "[OK] Đóng gói Medilab xong."
