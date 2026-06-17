@@ -7,14 +7,18 @@ echo "[SenOS] === Bộ gõ tiếng Việt: ibus-bamboo ==="
 apt-get purge -y 'fcitx5*' fcitx5-lotus >/dev/null 2>&1 || true
 rm -f /etc/apt/sources.list.d/fcitx5-lotus.list /etc/apt/keyrings/fcitx5-lotus.gpg 2>/dev/null || true
 
-# Cài ibus + ibus-bamboo (có trong noble universe)
+# Cài ibus từ repo + ibus-bamboo từ .deb noble (PPA launchpad — không có trong universe)
 apt-get update -y >/dev/null 2>&1 || true
-if ! apt-get install -y --no-install-recommends ibus ibus-gtk ibus-gtk3 ibus-gtk4 ibus-bamboo; then
-    echo "[WARN] cài từ repo lỗi — thử PPA bamboo-engine"
-    apt-get install -y --no-install-recommends software-properties-common || true
-    add-apt-repository -y ppa:bamboo-engine/ibus-bamboo 2>/dev/null || true
-    apt-get update -y || true
-    apt-get install -y --no-install-recommends ibus ibus-gtk3 ibus-bamboo || true
+apt-get install -y --no-install-recommends ibus ibus-gtk ibus-gtk3 ibus-gtk4 || true
+POOL="https://ppa.launchpadcontent.net/bamboo-engine/ibus-bamboo/ubuntu/pool/main/i/ibus-bamboo"
+DEB=$(curl -fsSL "$POOL/" 2>/dev/null | grep -oE 'ibus-bamboo_[^"]+~ubuntu24\.04[^"]*_amd64\.deb' | sort -V | tail -1)
+[ -z "$DEB" ] && DEB="ibus-bamboo_0.8.5-0~202605181527~ubuntu24.04.1_amd64.deb"
+echo "[ibus-bamboo] Tải $DEB"
+if wget -q -O /tmp/ibus-bamboo.deb "$POOL/$DEB"; then
+    apt-get install -y /tmp/ibus-bamboo.deb || { dpkg -i /tmp/ibus-bamboo.deb || true; apt-get install -f -y || true; }
+    rm -f /tmp/ibus-bamboo.deb
+else
+    echo "[WARN] không tải được ibus-bamboo .deb"
 fi
 
 # Đặt input method = ibus cho toàn hệ thống
