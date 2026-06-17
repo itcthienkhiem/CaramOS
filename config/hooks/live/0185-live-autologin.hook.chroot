@@ -1,0 +1,77 @@
+#!/bin/bash
+# Hook: live session phải tự đăng nhập thẳng vào Cinnamon.
+set -e
+
+echo "[SenOS] === Live autologin ==="
+
+# Live user do boot_config.sh ấn định cứng (username=senos trên kernel cmdline),
+# KHÔNG đọc casper.conf (hook này chạy trước 0200 nên casper.conf còn là "mint").
+LIVE_USER="senos"
+
+mkdir -p /etc/lightdm/lightdm.conf.d
+cat > /etc/lightdm/lightdm.conf.d/60-senos-live-autologin.conf <<EOF
+[Seat:*]
+autologin-guest=false
+autologin-user=${LIVE_USER}
+autologin-user-timeout=0
+autologin-session=cinnamon
+user-session=cinnamon
+greeter-session=slick-greeter
+EOF
+
+for f in /etc/casper.conf /etc/live.conf; do
+    [ -f "$f" ] || continue
+    if grep -q '^# export FLAVOUR=' "$f"; then
+        sed -i 's/^# export FLAVOUR=.*/export FLAVOUR="SenOS"/' "$f"
+    elif grep -q '^export FLAVOUR=' "$f"; then
+        sed -i 's/^export FLAVOUR=.*/export FLAVOUR="SenOS"/' "$f"
+    else
+        printf '\nexport FLAVOUR="SenOS"\n' >> "$f"
+    fi
+    sed -i 's/^export USERFULLNAME=.*/export USERFULLNAME="SenOS Live User"/' "$f"
+    sed -i 's/^export HOST=.*/export HOST="senos"/' "$f"
+done
+
+mkdir -p /var/lib/AccountsService/users
+cat > "/var/lib/AccountsService/users/${LIVE_USER}" <<EOF
+[User]
+Session=cinnamon
+XSession=cinnamon
+SystemAccount=false
+EOF
+
+mkdir -p /usr/share/initramfs-tools/scripts/casper-bottom
+cat > /usr/share/initramfs-tools/scripts/casper-bottom/26senos_autologin <<'EOF'
+#!/bin/sh
+set -e
+
+. /scripts/casper-functions
+
+LIVE_USER="${USERNAME:-senos}"
+mkdir -p /root/etc/lightdm/lightdm.conf.d
+cat > /root/etc/lightdm/lightdm.conf <<EOC
+[Seat:*]
+autologin-guest=false
+autologin-user=${LIVE_USER}
+autologin-user-timeout=0
+autologin-session=cinnamon
+user-session=cinnamon
+greeter-session=slick-greeter
+EOC
+cp /root/etc/lightdm/lightdm.conf /root/etc/lightdm/lightdm.conf.d/60-senos-live-autologin.conf
+
+if chroot /root getent passwd "$LIVE_USER" >/dev/null 2>&1; then
+    chroot /root usermod -aG nopasswdlogin "$LIVE_USER" 2>/dev/null || true
+    chroot /root chfn -f "SenOS Live User" "$LIVE_USER" 2>/dev/null || true
+    mkdir -p /root/var/lib/AccountsService/users
+    cat > "/root/var/lib/AccountsService/users/${LIVE_USER}" <<EOC
+[User]
+Session=cinnamon
+XSession=cinnamon
+SystemAccount=false
+EOC
+fi
+EOF
+chmod 755 /usr/share/initramfs-tools/scripts/casper-bottom/26senos_autologin
+
+echo "[OK] LightDM autologin user=${LIVE_USER}, session=cinnamon"
