@@ -64,8 +64,14 @@ REG
 timeout 120 xvfb-run -a wine regedit /S /tmp/medi-fonts.reg >/dev/null 2>&1 || true
 echo "  -> install .NET 8 desktop runtime"
 timeout 600 xvfb-run -a wine /opt/medilab/installers/windowsdesktop-runtime-8.0.28-win-x64.exe /install /quiet /norestart >/dev/null 2>&1 || true
-echo "  -> install Medilab (silent)"
-timeout 900 xvfb-run -a wine /opt/medilab/installers/Setup.exe /exenoui /qn >/dev/null 2>&1 || true
+echo "  -> install Medilab (silent, thử tối đa 3 lần tới khi có Medilab.exe)"
+for att in 1 2 3; do
+    timeout 800 xvfb-run -a wine /opt/medilab/installers/Setup.exe /exenoui /qn >/dev/null 2>&1 || true
+    if find "$WINEPREFIX/drive_c" -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
+        echo "  -> Medilab.exe đã có (lần $att)"; break
+    fi
+    echo "  -> lần $att chưa thấy Medilab.exe, thử lại..."; sleep 5
+done
 echo "  -> build-time install done"
 BUILDINSTALL
 chmod +x /tmp/medilab-buildinstall.sh
