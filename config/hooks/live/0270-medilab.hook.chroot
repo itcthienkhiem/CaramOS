@@ -38,12 +38,30 @@ export WINEARCH=win64
 export WINEDEBUG=-all
 export WINEDLLOVERRIDES="mscoree=d;mshtml=d"
 export DISPLAY=
-echo "  -> wineboot init"
-timeout 300 xvfb-run -a wineboot -u >/dev/null 2>&1 || true
+echo "  -> copy fonts (gồm Tahoma + font Windows có tiếng Việt) TRƯỚC wineboot"
 mkdir -p "$WINEPREFIX/drive_c/windows/Fonts"
-echo "  -> copy fonts"
 find /usr/share/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
     -exec cp -f {} "$WINEPREFIX/drive_c/windows/Fonts/" \; 2>/dev/null || true
+echo "  -> wineboot init (đăng ký font)"
+timeout 300 xvfb-run -a wineboot -u >/dev/null 2>&1 || true
+echo "  -> đăng ký Tahoma + MS Shell Dlg trong registry"
+cat > /tmp/medi-fonts.reg <<'REG'
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts]
+"Tahoma (TrueType)"="tahoma.ttf"
+"Tahoma Bold (TrueType)"="tahomabd.ttf"
+"Microsoft Sans Serif (TrueType)"="micross.ttf"
+"Segoe UI (TrueType)"="segoeui.ttf"
+"Arial (TrueType)"="arial.ttf"
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes]
+"MS Shell Dlg"="Tahoma"
+"MS Shell Dlg 2"="Tahoma"
+"Helv"="Tahoma"
+"System"="Tahoma"
+REG
+timeout 120 xvfb-run -a wine regedit /S /tmp/medi-fonts.reg >/dev/null 2>&1 || true
 echo "  -> install .NET 8 desktop runtime"
 timeout 600 xvfb-run -a wine /opt/medilab/installers/windowsdesktop-runtime-8.0.28-win-x64.exe /install /quiet /norestart >/dev/null 2>&1 || true
 echo "  -> install Medilab (silent)"
