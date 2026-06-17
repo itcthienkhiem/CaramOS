@@ -1,0 +1,68 @@
+#!/bin/bash
+# Hook: bộ gõ tiếng Việt ibus-bamboo (thay cho fcitx5-lotus).
+export DEBIAN_FRONTEND=noninteractive
+echo "[SenOS] === Bộ gõ tiếng Việt: ibus-bamboo ==="
+
+# Gỡ fcitx5/lotus nếu còn sót
+apt-get purge -y 'fcitx5*' fcitx5-lotus >/dev/null 2>&1 || true
+rm -f /etc/apt/sources.list.d/fcitx5-lotus.list /etc/apt/keyrings/fcitx5-lotus.gpg 2>/dev/null || true
+
+# Cài ibus + ibus-bamboo (có trong noble universe)
+apt-get update -y >/dev/null 2>&1 || true
+if ! apt-get install -y --no-install-recommends ibus ibus-gtk ibus-gtk3 ibus-gtk4 ibus-bamboo; then
+    echo "[WARN] cài từ repo lỗi — thử PPA bamboo-engine"
+    apt-get install -y --no-install-recommends software-properties-common || true
+    add-apt-repository -y ppa:bamboo-engine/ibus-bamboo 2>/dev/null || true
+    apt-get update -y || true
+    apt-get install -y --no-install-recommends ibus ibus-gtk3 ibus-bamboo || true
+fi
+
+# Đặt input method = ibus cho toàn hệ thống
+mkdir -p /etc/environment.d /etc/profile.d
+cat > /etc/environment.d/90-ibus.conf <<'ENV'
+GTK_IM_MODULE=ibus
+QT_IM_MODULE=ibus
+QT4_IM_MODULE=ibus
+XMODIFIERS=@im=ibus
+ENV
+cat > /etc/profile.d/90-ibus.sh <<'PROF'
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+PROF
+chmod 644 /etc/profile.d/90-ibus.sh
+
+# im-config: chọn ibus cho user mặc định
+mkdir -p /etc/skel
+echo "run_im ibus" > /etc/skel/.xinputrc
+
+# Autostart ibus-daemon trong mọi phiên desktop
+mkdir -p /etc/xdg/autostart
+cat > /etc/xdg/autostart/ibus-bamboo.desktop <<'AUTO'
+[Desktop Entry]
+Type=Application
+Name=Bộ gõ tiếng Việt (ibus-bamboo)
+Exec=ibus-daemon -drxR
+X-GNOME-Autostart-Phase=Applications
+NoDisplay=true
+OnlyShowIn=GNOME;Unity;Cinnamon;MATE;XFCE;LXDE;
+AUTO
+
+# Engine mặc định = Bamboo + phím chuyển Ctrl+Space
+mkdir -p /etc/dconf/db/local.d
+cat > /etc/dconf/db/local.d/02-ibus <<'DCONF'
+[org/freedesktop/ibus/general]
+preload-engines=['xkb:us::eng', 'Bamboo']
+engines-order=['xkb:us::eng', 'Bamboo']
+use-system-keyboard-layout=true
+
+[org/freedesktop/ibus/general/hotkey]
+triggers=['<Control>space']
+DCONF
+dconf update 2>/dev/null || true
+
+if dpkg -l ibus-bamboo >/dev/null 2>&1; then
+    echo "[OK] ibus-bamboo đã cài (gõ Telex, chuyển Việt/Anh bằng Ctrl+Space)."
+else
+    echo "[WARN] ibus-bamboo CHƯA cài được — kiểm tra mạng/repo."
+fi

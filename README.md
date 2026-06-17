@@ -46,7 +46,7 @@ trình duyệt, ứng dụng văn phòng và các tiện ích quen thuộc.
 | **Dựa trên Linux Mint 22.3** | Nền Ubuntu 24.04 LTS ổn định, desktop Cinnamon quen thuộc |
 | **Giao diện SenOS** | Branding SenOS, boot menu/Plymouth, logo, wallpaper, panel và theme được tuỳ biến |
 | **Tiếng Việt mặc định** | Locale Việt Nam, timezone Asia/Ho_Chi_Minh, font Be Vietnam Pro |
-| **Bộ gõ tiếng Việt** | Fcitx5 + Lotus được cài và cấu hình sẵn |
+| **Bộ gõ tiếng Việt** | ibus-bamboo được cài và cấu hình sẵn (gõ Telex) |
 | **Google Chrome** | Trình duyệt phổ biến được cài sẵn |
 | **WPS Office** | Bộ ứng dụng văn phòng thân thiện với người dùng chuyển từ Windows |
 | **Zalo** | Zalo AppImage được cài sẵn và có shortcut ngoài Desktop |
@@ -86,7 +86,7 @@ thân thiện, hiện đại và sẵn sàng cho người dùng Việt Nam.
 | **Icons** | Tela circle / Cinnamon Delight Icons |
 | **Cursor** | Bibata |
 | **Font** | Be Vietnam Pro |
-| **Input method** | Fcitx5 + Lotus |
+| **Input method** | ibus-bamboo |
 | **Browser** | Google Chrome |
 | **Office** | WPS Office |
 | **Chat** | Zalo AppImage |

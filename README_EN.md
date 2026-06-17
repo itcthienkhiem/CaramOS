@@ -37,7 +37,7 @@
 |---|---|
 | **Chrome OS-style UI** | Clean, modern, rounded icons, grid launcher |
 | **SenOS Center** | One-click Windows app installer (Zalo, Photoshop, Office, games) |
-| **Vietnamese-first** | Vietnamese locale by default, fcitx5-lotus input method, Vietnamese fonts |
+| **Vietnamese-first** | Vietnamese locale by default, ibus-bamboo input method, Vietnamese fonts |
 | **Offline AI** | Local AI assistant — chat, translate, summarize, spell-check |
 | **Safe updates** | mintupdate with risk-level classification — never breaks your system |
 | **One-click backup** | Timeshift snapshots — restore in 2 minutes |
@@ -100,7 +100,7 @@ SenOS Center is SenOS's signature application that routes users to the right eng
 | **Windows Apps** | Bottles + Wine |
 | **Windows Games** | Lutris + Wine |
 | **Web Apps** | Webapp Manager (PWA) |
-| **Input Method** | fcitx5-lotus (Vietnamese) |
+| **Input Method** | ibus-bamboo (Vietnamese) |
 | **AI** | Ollama (Gemma 2B / Phi-3 Mini) |
 | **Backup** | Timeshift |
 | **Updates** | mintupdate |
