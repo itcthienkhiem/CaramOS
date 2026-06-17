@@ -26,7 +26,8 @@ echo "[Medilab] Cài Xvfb + dựng Wine prefix sẵn (best-effort, có timeout).
 apt-get install -y --no-install-recommends xvfb >/dev/null 2>&1 || echo "[WARN] không cài được xvfb"
 
 BUSER=winebld
-id "$BUSER" >/dev/null 2>&1 || useradd -m -s /bin/bash "$BUSER"
+# System user (uid < 1000) -> không đụng uid 1000 của live user, không hiện ở greeter.
+id "$BUSER" >/dev/null 2>&1 || useradd -r -m -d /home/"$BUSER" -s /bin/bash "$BUSER"
 mkdir -p "$MDIR/wineprefix"
 chown -R "$BUSER:$BUSER" "$MDIR"
 
@@ -54,9 +55,16 @@ chown "$BUSER:$BUSER" /tmp/medilab-buildinstall.sh
 runuser -u "$BUSER" -- /tmp/medilab-buildinstall.sh || true
 rm -f /tmp/medilab-buildinstall.sh
 
+# Dọn user tạm TRIỆT ĐỂ (nếu sót sẽ chiếm uid 1000 -> hỏng auto-login live).
+runuser -u "$BUSER" -- bash -c 'WINEPREFIX=/opt/medilab/wineprefix wineserver -k' 2>/dev/null || true
+pkill -9 -u "$BUSER" 2>/dev/null || true
+sleep 2
 # Giữ prefix làm template (root sở hữu) để copy sang từng user.
 chown -R root:root "$MDIR"
-userdel -r "$BUSER" 2>/dev/null || true
+userdel -f "$BUSER" 2>/dev/null || true
+sed -i "/^${BUSER}:/d" /etc/passwd /etc/shadow /etc/group /etc/gshadow 2>/dev/null || true
+rm -rf /home/"$BUSER"
+if id "$BUSER" >/dev/null 2>&1; then echo "[WARN] user tạm $BUSER vẫn còn!"; else echo "[OK] đã xoá user tạm $BUSER"; fi
 
 if find "$MDIR/wineprefix" -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
     echo "[OK] Đã cài sẵn Medilab vào prefix template."
