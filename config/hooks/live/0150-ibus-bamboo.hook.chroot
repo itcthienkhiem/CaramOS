@@ -36,6 +36,13 @@ export XMODIFIERS=@im=ibus
 PROF
 chmod 644 /etc/profile.d/90-ibus.sh
 
+# QUAN TRỌNG: /etc/environment được PAM đọc cho MỌI phiên (gồm Cinnamon/X) —
+# nơi tin cậy nhất để app dùng ibus. (environment.d/profile.d không đủ cho phiên X.)
+for kv in GTK_IM_MODULE=ibus QT_IM_MODULE=ibus QT4_IM_MODULE=ibus CLUTTER_IM_MODULE=ibus XMODIFIERS=@im=ibus; do
+    k="${kv%%=*}"
+    grep -q "^${k}=" /etc/environment 2>/dev/null || echo "$kv" >> /etc/environment
+done
+
 # im-config: chọn ibus cho user mặc định
 mkdir -p /etc/skel
 echo "run_im ibus" > /etc/skel/.xinputrc

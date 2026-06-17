@@ -10,6 +10,11 @@ MDIR=/opt/medilab
 INST="$MDIR/installers"
 mkdir -p "$INST"
 
+# Tạo locale en_US.UTF-8 để Medilab hiển thị số kiểu "." (12.3 không thành 123)
+sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen 2>/dev/null || true
+grep -q "^en_US.UTF-8 UTF-8" /etc/locale.gen 2>/dev/null || echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen en_US.UTF-8 >/dev/null 2>&1 || locale-gen >/dev/null 2>&1 || true
+
 SETUP_URL="https://www.dropbox.com/scl/fi/ul285bcvklwuxmp18cpup/Setup.exe?rlkey=mmh3tot6w7br40cni8kkwvovu&dl=1"
 DOTNET_URL="https://www.dropbox.com/scl/fi/hwnbmy6f6rs28dm52cqpf/windowsdesktop-runtime-8.0.28-win-x64.exe?rlkey=01tetda92b04bir2jbumf3hz3&dl=1"
 
@@ -194,6 +199,9 @@ chmod +x /usr/local/bin/medilab-install
 cat > /usr/local/bin/medilab-run <<'RUN'
 #!/bin/bash
 export WINEDEBUG=-all
+# .NET dưới Wine lấy định dạng số theo locale -> ép en-US để "12.3" không thành "123".
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 UPREFIX="$HOME/.local/share/medilab/wine"
 # Lần đầu: nếu có prefix-template đã cài sẵn lúc build -> copy sang home (nhanh)
 if [ ! -d "$UPREFIX" ] && [ -d /opt/medilab/wineprefix ] && find /opt/medilab/wineprefix -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
