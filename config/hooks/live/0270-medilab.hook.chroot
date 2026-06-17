@@ -1,0 +1,112 @@
+#!/bin/bash
+# Hook: đóng gói Medilab (AKSOFT) — app .NET 8 WPF chạy qua Wine.
+# Build-time: tải bộ cài + .NET runtime vào ISO, cài script + launcher.
+# First-run (máy người dùng): medilab-install dựng Wine prefix, cài runtime/font/app.
+export DEBIAN_FRONTEND=noninteractive
+echo "[SenOS] === Đóng gói Medilab (AKSOFT) ==="
+
+MDIR=/opt/medilab
+INST="$MDIR/installers"
+mkdir -p "$INST"
+
+SETUP_URL="https://www.dropbox.com/scl/fi/ul285bcvklwuxmp18cpup/Setup.exe?rlkey=mmh3tot6w7br40cni8kkwvovu&dl=1"
+DOTNET_URL="https://www.dropbox.com/scl/fi/hwnbmy6f6rs28dm52cqpf/windowsdesktop-runtime-8.0.28-win-x64.exe?rlkey=01tetda92b04bir2jbumf3hz3&dl=1"
+
+echo "[Medilab] Tải bộ cài Medilab (~115MB)..."
+wget -q -O "$INST/Setup.exe" "$SETUP_URL" || echo "[WARN] tải Setup.exe thất bại"
+echo "[Medilab] Tải .NET 8 Desktop Runtime (~56MB)..."
+wget -q -O "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" "$DOTNET_URL" || echo "[WARN] tải .NET runtime thất bại"
+ls -lh "$INST" || true
+
+# --- Script cài đặt lần đầu (chạy trong phiên người dùng, có Wine + màn hình) ---
+cat > /usr/local/bin/medilab-install <<'INSTALL'
+#!/bin/bash
+# Cài Medilab qua Wine cho user hiện tại.
+set -u
+INST=/opt/medilab/installers
+export WINEPREFIX="$HOME/.local/share/medilab/wine"
+export WINEARCH=win64
+export WINEDEBUG=-all
+
+echo "================ Cài đặt Medilab (AKSOFT) ================"
+echo "Môi trường: Wine + .NET 8 Desktop Runtime"
+mkdir -p "$WINEPREFIX"
+
+echo "[1/4] Khởi tạo Wine prefix (lần đầu mất 1-2 phút)..."
+wineboot -u >/dev/null 2>&1 || wineboot -i >/dev/null 2>&1 || true
+
+echo "[2/4] Cài bộ font cho Medilab..."
+mkdir -p "$WINEPREFIX/drive_c/windows/Fonts"
+# Copy font hệ thống (gồm Be Vietnam Pro, Noto, DejaVu...) vào prefix
+find /usr/share/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
+    -exec cp -f {} "$WINEPREFIX/drive_c/windows/Fonts/" \; 2>/dev/null || true
+# Font Windows core (Times New Roman, Arial, Tahoma...) nếu có mạng
+command -v winetricks >/dev/null 2>&1 && winetricks -q corefonts >/dev/null 2>&1 || true
+
+echo "[3/4] Cài .NET 8 Desktop Runtime (qua Wine)..."
+if [ -f "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" ]; then
+    wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" /install /quiet /norestart 2>/dev/null \
+        || wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" 2>/dev/null || true
+fi
+
+echo "[4/4] Cài Medilab..."
+if [ -f "$INST/Setup.exe" ]; then
+    # Advanced Installer: thử im lặng, không được thì mở GUI cài
+    wine "$INST/Setup.exe" /exenoui /qn 2>/dev/null || wine "$INST/Setup.exe" 2>/dev/null || true
+fi
+
+echo "Hoàn tất. Mở Medilab từ menu hoặc icon trên Desktop."
+command -v notify-send >/dev/null 2>&1 && notify-send "Medilab" "Cài đặt xong. Mở Medilab từ Desktop." || true
+read -p "Nhấn Enter để đóng..." _ 2>/dev/null || true
+INSTALL
+chmod +x /usr/local/bin/medilab-install
+
+# --- Script chạy Medilab (tự cài nếu chưa có) ---
+cat > /usr/local/bin/medilab-run <<'RUN'
+#!/bin/bash
+export WINEPREFIX="$HOME/.local/share/medilab/wine"
+export WINEDEBUG=-all
+EXE=$(find "$WINEPREFIX/drive_c" -iname 'Medilab.exe' 2>/dev/null | head -1)
+if [ -z "$EXE" ]; then
+    # Chưa cài -> chạy trình cài đặt trong terminal
+    exec x-terminal-emulator -e /usr/local/bin/medilab-install 2>/dev/null \
+        || exec gnome-terminal -- /usr/local/bin/medilab-install 2>/dev/null \
+        || /usr/local/bin/medilab-install
+fi
+exec wine "$EXE"
+RUN
+chmod +x /usr/local/bin/medilab-run
+
+# --- Desktop launchers ---
+cat > /usr/share/applications/medilab.desktop <<'DESK'
+[Desktop Entry]
+Type=Application
+Name=Medilab
+Name[vi]=Medilab
+Comment=Phần mềm Medilab (AKSOFT) — chạy qua Wine
+Comment[vi]=Phần mềm Medilab (AKSOFT) — chạy qua Wine
+Exec=/usr/local/bin/medilab-run
+Icon=senos-logo
+Terminal=false
+Categories=Office;Science;
+StartupNotify=true
+DESK
+
+cat > /usr/share/applications/medilab-install.desktop <<'DESK2'
+[Desktop Entry]
+Type=Application
+Name=Cài đặt Medilab
+Comment=Cài/cài lại Medilab qua Wine (.NET 8 + font)
+Exec=/usr/local/bin/medilab-install
+Icon=senos-logo
+Terminal=true
+Categories=System;
+DESK2
+
+# --- Icon Medilab trên Desktop cho user mặc định ---
+mkdir -p /etc/skel/Desktop
+cp -f /usr/share/applications/medilab.desktop /etc/skel/Desktop/medilab.desktop
+chmod +x /etc/skel/Desktop/medilab.desktop
+gio set /etc/skel/Desktop/medilab.desktop metadata::trusted true 2>/dev/null || true
+
+echo "[OK] Đóng gói Medilab xong (bộ cài tại $INST, cài lần đầu khi mở Medilab)."
