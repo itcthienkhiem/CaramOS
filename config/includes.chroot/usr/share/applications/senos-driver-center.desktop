@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=SenOS Driver Center
+Name[vi]=Trung tâm Driver SenOS
+Comment=Chọn và cài driver máy in, máy scan, GPU/Wi-Fi
+Exec=/usr/bin/senos-driver-center
+Icon=printer
+Terminal=false
+Categories=Settings;HardwareSettings;System;
+StartupNotify=true

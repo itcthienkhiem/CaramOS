@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_TITLE="SenOS Driver Center"
+LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/senos-driver-center.log"
+
+mkdir -p "$(dirname "$LOG_FILE")"
+
+have_gui() {
+    command -v zenity >/dev/null 2>&1 && [ -n "${DISPLAY:-}" ]
+}
+
+info() {
+    if have_gui; then
+        zenity --info --title="$APP_TITLE" --width=520 --text="$1" 2>/dev/null || true
+    else
+        printf '%s\n' "$1"
+    fi
+}
+
+error_box() {
+    if have_gui; then
+        zenity --error --title="$APP_TITLE" --width=560 --text="$1" 2>/dev/null || true
+    else
+        printf 'ERROR: %s\n' "$1" >&2
+    fi
+}
+
+select_profiles() {
+    if have_gui; then
+        zenity --list --checklist --title="$APP_TITLE" --width=760 --height=430 \
+            --text="Chọn driver cần cài hoặc kích hoạt:" \
+            --column="Chọn" --column="Mã" --column="Driver" \
+            FALSE auto "Tự phát hiện driver bằng ubuntu-drivers" \
+            TRUE printer-common "Máy in phổ biến: CUPS, Gutenprint, PDF, AirPrint/IPP" \
+            FALSE hp "HP: HPLIP + giao diện cấu hình" \
+            FALSE epson "Epson: ESC/P-R + Gutenprint" \
+            FALSE brother "Brother: brlaser + P-touch" \
+            FALSE samsung "Samsung/Xerox: SPLIX + foo2zjs" \
+            FALSE scanner "Máy scan mạng/USB: SANE + AirScan" \
+            --separator=" " 2>/dev/null || true
+    else
+        printf 'printer-common\n'
+    fi
+}
+
+packages_for() {
+    case "$1" in
+        printer-common)
+            printf '%s\n' cups cups-browsed cups-client system-config-printer printer-driver-all printer-driver-cups-pdf printer-driver-gutenprint
+            ;;
+        hp)
+            printf '%s\n' hplip hplip-gui printer-driver-hpcups printer-driver-postscript-hp
+            ;;
+        epson)
+            printf '%s\n' printer-driver-escpr printer-driver-gutenprint
+            ;;
+        brother)
+            printf '%s\n' printer-driver-brlaser printer-driver-ptouch
+            ;;
+        samsung)
+            printf '%s\n' printer-driver-splix printer-driver-foo2zjs
+            ;;
+        scanner)
+            printf '%s\n' sane-airscan sane-utils simple-scan
+            ;;
+    esac
+}
+
+run_install() {
+    local profiles=("$@")
+    local pkg_file
+    pkg_file="$(mktemp)"
+    trap 'rm -f "$pkg_file"' RETURN
+
+    for profile in "${profiles[@]}"; do
+        packages_for "$profile" >> "$pkg_file"
+    done
+    sort -u "$pkg_file" -o "$pkg_file"
+
+    {
+        echo "=== $APP_TITLE $(date -Is) ==="
+        echo "Profiles: ${profiles[*]}"
+        echo "Packages:"
+        cat "$pkg_file"
+        echo
+    } >> "$LOG_FILE"
+
+    if [ ! -s "$pkg_file" ]; then
+        info "Không có gói driver nào được chọn."
+        return 0
+    fi
+
+    local command_text
+    command_text='set -e; export DEBIAN_FRONTEND=noninteractive; apt-get update; xargs -r apt-get install -y < '"$pkg_file"'; systemctl enable --now cups 2>/dev/null || true; systemctl restart cups 2>/dev/null || true; ubuntu-drivers autoinstall 2>/dev/null || true'
+
+    if command -v pkexec >/dev/null 2>&1; then
+        pkexec bash -c "$command_text" 2>&1 | tee -a "$LOG_FILE"
+    else
+        x-terminal-emulator -e "sudo bash -c '$command_text'" 2>/dev/null || sudo bash -c "$command_text" 2>&1 | tee -a "$LOG_FILE"
+    fi
+}
+
+main() {
+    local selected
+    selected="$(select_profiles)"
+    selected="${selected//|/ }"
+
+    if [ -z "$selected" ]; then
+        exit 0
+    fi
+
+    local profiles=()
+    local run_auto=false
+    for item in $selected; do
+        if [ "$item" = "auto" ]; then
+            run_auto=true
+        else
+            profiles+=("$item")
+        fi
+    done
+
+    run_install "${profiles[@]}"
+
+    if [ "$run_auto" = true ]; then
+        if command -v pkexec >/dev/null 2>&1; then
+            pkexec ubuntu-drivers autoinstall 2>&1 | tee -a "$LOG_FILE" || true
+        else
+            sudo ubuntu-drivers autoinstall 2>&1 | tee -a "$LOG_FILE" || true
+        fi
+    fi
+
+    info "Đã xử lý driver đã chọn. Log: $LOG_FILE"
+}
+
+main "$@"

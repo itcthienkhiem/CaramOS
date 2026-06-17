@@ -11,3 +11,27 @@ copyq
 
 # ZRAM mặc định cho máy RAM thấp
 systemd-zram-generator
+
+# Printer / scanner / hardware driver center
+zenity
+policykit-1
+cups
+cups-browsed
+cups-client
+system-config-printer
+printer-driver-all
+printer-driver-cups-pdf
+printer-driver-gutenprint
+printer-driver-escpr
+printer-driver-brlaser
+printer-driver-ptouch
+printer-driver-splix
+printer-driver-foo2zjs
+hplip
+hplip-gui
+printer-driver-hpcups
+printer-driver-postscript-hp
+sane-airscan
+sane-utils
+simple-scan
+ubuntu-drivers-common

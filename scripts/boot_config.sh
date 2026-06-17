@@ -40,6 +40,7 @@ step_boot_config() {
                 -e "s/Start Linux Mint/Start ${BRAND_NAME}/gI" \
                 -e "s/Linux Mint [0-9.]* Cinnamon 64-bit/${BRAND_TITLE}/gI" \
                 -e "s/Linux Mint/${BRAND_NAME}/gI" \
+                -e "s/--class linuxmint/--class senos/gI" \
                 -e "s/username=mint/username=${LIVE_USER}/gI" \
                 -e "s/hostname=mint/hostname=${LIVE_HOST}/gI" \
                 -e "s/locale=[^[:space:]]*//gI" \
@@ -94,6 +95,7 @@ step_boot_config() {
                 -e "s/Start Linux Mint/Start ${BRAND_NAME}/gI" \
                 -e "s/Linux Mint [0-9.]* Cinnamon 64-bit/${BRAND_TITLE}/gI" \
                 -e "s/Linux Mint/${BRAND_NAME}/gI" \
+                -e "s/--class linuxmint/--class senos/gI" \
                 -e "s/username=mint/username=${LIVE_USER}/gI" \
                 -e "s/hostname=mint/hostname=${LIVE_HOST}/gI" \
                 -e "s/locale=[^[:space:]]*//gI" \

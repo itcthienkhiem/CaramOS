@@ -9,7 +9,7 @@ rm -f /etc/apt/sources.list.d/fcitx5-lotus.list /etc/apt/keyrings/fcitx5-lotus.g
 
 # Cài ibus từ repo + ibus-bamboo từ .deb noble (PPA launchpad — không có trong universe)
 apt-get update -y >/dev/null 2>&1 || true
-apt-get install -y --no-install-recommends ibus ibus-gtk ibus-gtk3 ibus-gtk4 || true
+apt-get install -y --no-install-recommends ibus ibus-gtk ibus-gtk3 ibus-gtk4 gir1.2-ibus-1.0 || true
 POOL="https://ppa.launchpadcontent.net/bamboo-engine/ibus-bamboo/ubuntu/pool/main/i/ibus-bamboo"
 DEB=$(curl -fsSL "$POOL/" 2>/dev/null | grep -oE 'ibus-bamboo_[^"]+~ubuntu24\.04[^"]*_amd64\.deb' | sort -V | tail -1)
 [ -z "$DEB" ] && DEB="ibus-bamboo_0.8.5-0~202605181527~ubuntu24.04.1_amd64.deb"
@@ -46,13 +46,13 @@ cat > /etc/xdg/autostart/ibus-bamboo.desktop <<'AUTO'
 [Desktop Entry]
 Type=Application
 Name=Bộ gõ tiếng Việt (ibus-bamboo)
-Exec=ibus-daemon -drxR
+Exec=sh -c 'if [ -x /usr/libexec/ibus-ui-gtk3 ]; then ibus-daemon -drxR --panel=/usr/libexec/ibus-ui-gtk3; else ibus-daemon -drxR; fi'
 X-GNOME-Autostart-Phase=Applications
 NoDisplay=true
 OnlyShowIn=GNOME;Unity;Cinnamon;MATE;XFCE;LXDE;
 AUTO
 
-# Engine mặc định = Bamboo + phím chuyển Ctrl+Space
+# Engine mặc định = Bamboo + phím chuyển Ctrl+Space + icon ở systray góc phải
 mkdir -p /etc/dconf/db/local.d
 cat > /etc/dconf/db/local.d/02-ibus <<'DCONF'
 [org/freedesktop/ibus/general]
@@ -62,6 +62,11 @@ use-system-keyboard-layout=true
 
 [org/freedesktop/ibus/general/hotkey]
 triggers=['<Control>space']
+
+[org/freedesktop/ibus/panel]
+show=2
+show-icon-on-systray=true
+show-im-name=true
 DCONF
 dconf update 2>/dev/null || true
 

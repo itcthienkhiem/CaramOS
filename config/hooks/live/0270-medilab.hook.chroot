@@ -14,9 +14,17 @@ SETUP_URL="https://www.dropbox.com/scl/fi/ul285bcvklwuxmp18cpup/Setup.exe?rlkey=
 DOTNET_URL="https://www.dropbox.com/scl/fi/hwnbmy6f6rs28dm52cqpf/windowsdesktop-runtime-8.0.28-win-x64.exe?rlkey=01tetda92b04bir2jbumf3hz3&dl=1"
 
 echo "[Medilab] Tải bộ cài Medilab (~115MB)..."
-wget -q -O "$INST/Setup.exe" "$SETUP_URL" || echo "[WARN] tải Setup.exe thất bại"
+if [ -s "$INST/Setup.exe" ]; then
+    echo "[Medilab] Dùng Setup.exe đã có sẵn trong image."
+else
+    wget -q -O "$INST/Setup.exe" "$SETUP_URL" || echo "[WARN] tải Setup.exe thất bại"
+fi
 echo "[Medilab] Tải .NET 8 Desktop Runtime (~56MB)..."
-wget -q -O "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" "$DOTNET_URL" || echo "[WARN] tải .NET runtime thất bại"
+if [ -s "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" ]; then
+    echo "[Medilab] Dùng .NET runtime đã có sẵn trong image."
+else
+    wget -q -O "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" "$DOTNET_URL" || echo "[WARN] tải .NET runtime thất bại"
+fi
 ls -lh "$INST" || true
 
 # ---------------------------------------------------------------------------
@@ -28,6 +36,10 @@ apt-get install -y --no-install-recommends xvfb >/dev/null 2>&1 || echo "[WARN] 
 BUSER=winebld
 # System user (uid < 1000) -> không đụng uid 1000 của live user, không hiện ở greeter.
 id "$BUSER" >/dev/null 2>&1 || useradd -r -m -d /home/"$BUSER" -s /bin/bash "$BUSER"
+if [ -d "$MDIR/wineprefix" ] && ! find "$MDIR/wineprefix" -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
+    echo "[Medilab] Xoá Wine prefix template cũ vì chưa có Medilab.exe."
+    rm -rf "$MDIR/wineprefix"
+fi
 mkdir -p "$MDIR/wineprefix"
 chown -R "$BUSER:$BUSER" "$MDIR"
 
@@ -62,11 +74,41 @@ REGEDIT4
 "System"="Tahoma"
 REG
 timeout 120 xvfb-run -a wine regedit /S /tmp/medi-fonts.reg >/dev/null 2>&1 || true
+echo "  -> ép định dạng số Windows: decimal='.' thousands=','"
+cat > /tmp/medi-locale.reg <<'REG'
+REGEDIT4
+
+[HKEY_CURRENT_USER\Control Panel\International]
+"LocaleName"="en-US"
+"sShortDate"="M/d/yyyy"
+"sLongDate"="dddd, MMMM d, yyyy"
+"sShortTime"="h:mm tt"
+"sTimeFormat"="h:mm:ss tt"
+"s1159"="AM"
+"s2359"="PM"
+"sDecimal"="."
+"sThousand"=","
+"sMonDecimalSep"="."
+"sMonThousandSep"=","
+"iDigits"="2"
+"iLZero"="1"
+"iMeasure"="1"
+"iNegNumber"="1"
+"iCountry"="1"
+"iCurrDigits"="2"
+"NumShape"="1"
+REG
+timeout 120 xvfb-run -a wine regedit /S /tmp/medi-locale.reg >/dev/null 2>&1 || true
 echo "  -> install .NET 8 desktop runtime"
-timeout 600 xvfb-run -a wine /opt/medilab/installers/windowsdesktop-runtime-8.0.28-win-x64.exe /install /quiet /norestart >/dev/null 2>&1 || true
-echo "  -> install Medilab (silent, thử tối đa 3 lần tới khi có Medilab.exe)"
+timeout 900 xvfb-run -a wine /opt/medilab/installers/windowsdesktop-runtime-8.0.28-win-x64.exe /install /quiet /norestart /log C:\\dotnet-runtime-install.log >/dev/null 2>&1 || true
+if [ -d "$WINEPREFIX/drive_c/Program Files/dotnet/shared/Microsoft.WindowsDesktop.App/8.0.28" ]; then
+    echo "  -> .NET Windows Desktop Runtime 8.0.28 đã có"
+else
+    echo "  -> WARN: chưa thấy .NET Windows Desktop Runtime 8.0.28 sau khi cài"
+fi
+echo "  -> install Medilab (Advanced Installer /quiet, thử tối đa 3 lần tới khi có Medilab.exe)"
 for att in 1 2 3; do
-    timeout 800 xvfb-run -a wine /opt/medilab/installers/Setup.exe /exenoui /qn >/dev/null 2>&1 || true
+    timeout 600 xvfb-run -a wine /opt/medilab/installers/Setup.exe /quiet /norestart /log C:\\medilab-install.log >/dev/null 2>&1 || true
     if find "$WINEPREFIX/drive_c" -iname 'Medilab.exe' 2>/dev/null | grep -q .; then
         echo "  -> Medilab.exe đã có (lần $att)"; break
     fi
@@ -108,15 +150,40 @@ echo "================ Cài đặt Medilab (AKSOFT) ================"
 mkdir -p "$WINEPREFIX"
 echo "[1/4] Khởi tạo Wine prefix..."
 wineboot -u >/dev/null 2>&1 || true
-echo "[2/4] Cài font..."
+echo "[2/4] Cài font và định dạng số..."
 mkdir -p "$WINEPREFIX/drive_c/windows/Fonts"
 find /usr/share/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) -exec cp -f {} "$WINEPREFIX/drive_c/windows/Fonts/" \; 2>/dev/null || true
 command -v winetricks >/dev/null 2>&1 && winetricks -q corefonts >/dev/null 2>&1 || true
+cat > /tmp/medilab-locale.reg <<'REG'
+REGEDIT4
+
+[HKEY_CURRENT_USER\Control Panel\International]
+"LocaleName"="en-US"
+"sShortDate"="M/d/yyyy"
+"sLongDate"="dddd, MMMM d, yyyy"
+"sShortTime"="h:mm tt"
+"sTimeFormat"="h:mm:ss tt"
+"s1159"="AM"
+"s2359"="PM"
+"sDecimal"="."
+"sThousand"=","
+"sMonDecimalSep"="."
+"sMonThousandSep"=","
+"iDigits"="2"
+"iLZero"="1"
+"iMeasure"="1"
+"iNegNumber"="1"
+"iCountry"="1"
+"iCurrDigits"="2"
+"NumShape"="1"
+REG
+wine regedit /S /tmp/medilab-locale.reg >/dev/null 2>&1 || true
+rm -f /tmp/medilab-locale.reg
 echo "[3/4] Cài .NET 8 Desktop Runtime..."
 [ -f "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" ] && \
-  { wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" /install /quiet /norestart 2>/dev/null || wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" 2>/dev/null || true; }
+  { wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" /install /quiet /norestart /log C:\\dotnet-runtime-install.log 2>/dev/null || wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" 2>/dev/null || true; }
 echo "[4/4] Cài Medilab..."
-[ -f "$INST/Setup.exe" ] && { wine "$INST/Setup.exe" /exenoui /qn 2>/dev/null || wine "$INST/Setup.exe" 2>/dev/null || true; }
+[ -f "$INST/Setup.exe" ] && { wine "$INST/Setup.exe" /quiet /norestart /log C:\\medilab-install.log 2>/dev/null || wine "$INST/Setup.exe" 2>/dev/null || true; }
 echo "Hoàn tất."
 command -v notify-send >/dev/null 2>&1 && notify-send "Medilab" "Cài đặt xong." || true
 read -p "Nhấn Enter để đóng..." _ 2>/dev/null || true

@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+echo "[SenOS] === Cấu hình SenOS Driver Center ==="
+
+if [ -f /usr/bin/senos-driver-center ]; then
+    chmod 755 /usr/bin/senos-driver-center
+fi
+
+mkdir -p /etc/skel/Desktop
+if [ -f /usr/share/applications/senos-driver-center.desktop ]; then
+    cp -f /usr/share/applications/senos-driver-center.desktop /etc/skel/Desktop/senos-driver-center.desktop
+    chmod 755 /etc/skel/Desktop/senos-driver-center.desktop
+    gio set /etc/skel/Desktop/senos-driver-center.desktop metadata::trusted true 2>/dev/null || true
+fi
+
+systemctl enable cups >/dev/null 2>&1 || true
+
+echo "[OK] SenOS Driver Center đã sẵn sàng."
