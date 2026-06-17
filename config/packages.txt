@@ -27,10 +27,6 @@ printer-driver-brlaser
 printer-driver-ptouch
 printer-driver-splix
 printer-driver-foo2zjs
-hplip
-hplip-gui
-printer-driver-hpcups
-printer-driver-postscript-hp
 sane-airscan
 sane-utils
 simple-scan

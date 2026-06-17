@@ -17,6 +17,7 @@ locale-gen en_US.UTF-8 >/dev/null 2>&1 || locale-gen >/dev/null 2>&1 || true
 
 SETUP_URL="https://www.dropbox.com/scl/fi/ul285bcvklwuxmp18cpup/Setup.exe?rlkey=mmh3tot6w7br40cni8kkwvovu&dl=1"
 DOTNET_URL="https://www.dropbox.com/scl/fi/hwnbmy6f6rs28dm52cqpf/windowsdesktop-runtime-8.0.28-win-x64.exe?rlkey=01tetda92b04bir2jbumf3hz3&dl=1"
+MONO_URL="https://dl.winehq.org/wine/wine-mono/11.0.0/wine-mono-11.0.0-x86.msi"
 
 echo "[Medilab] Tải bộ cài Medilab (~115MB)..."
 if [ -s "$INST/Setup.exe" ]; then
@@ -31,6 +32,12 @@ else
     wget -q -O "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" "$DOTNET_URL" || echo "[WARN] tải .NET runtime thất bại"
 fi
 ls -lh "$INST" || true
+echo "[Medilab] Tải Wine Mono installer (~82MB)..."
+if [ -s "$INST/wine-mono-11.0.0-x86.msi" ]; then
+    echo "[Medilab] Dùng Wine Mono installer đã có sẵn trong image."
+else
+    wget -q -O "$INST/wine-mono-11.0.0-x86.msi" "$MONO_URL" || echo "[WARN] tải Wine Mono thất bại"
+fi
 
 # ---------------------------------------------------------------------------
 # CÀI SẴN LÚC BUILD: Wine không chạy bằng root -> dùng user tạm + Xvfb headless.
@@ -53,7 +60,6 @@ cat > /tmp/medilab-buildinstall.sh <<'BUILDINSTALL'
 export WINEPREFIX=/opt/medilab/wineprefix
 export WINEARCH=win64
 export WINEDEBUG=-all
-export WINEDLLOVERRIDES="mscoree=d;mshtml=d"
 export DISPLAY=
 echo "  -> copy fonts (gồm Tahoma + font Windows có tiếng Việt) TRƯỚC wineboot"
 mkdir -p "$WINEPREFIX/drive_c/windows/Fonts"
@@ -104,6 +110,8 @@ REGEDIT4
 "NumShape"="1"
 REG
 timeout 120 xvfb-run -a wine regedit /S /tmp/medi-locale.reg >/dev/null 2>&1 || true
+echo "  -> install Wine Mono"
+timeout 600 xvfb-run -a wine msiexec /i /opt/medilab/installers/wine-mono-11.0.0-x86.msi /qn >/dev/null 2>&1 || true
 echo "  -> install .NET 8 desktop runtime"
 timeout 900 xvfb-run -a wine /opt/medilab/installers/windowsdesktop-runtime-8.0.28-win-x64.exe /install /quiet /norestart /log C:\\dotnet-runtime-install.log >/dev/null 2>&1 || true
 if [ -d "$WINEPREFIX/drive_c/Program Files/dotnet/shared/Microsoft.WindowsDesktop.App/8.0.28" ]; then
@@ -185,6 +193,8 @@ REG
 wine regedit /S /tmp/medilab-locale.reg >/dev/null 2>&1 || true
 rm -f /tmp/medilab-locale.reg
 echo "[3/4] Cài .NET 8 Desktop Runtime..."
+[ -f "$INST/wine-mono-11.0.0-x86.msi" ] && \
+  { wine msiexec /i "$INST/wine-mono-11.0.0-x86.msi" /qn 2>/dev/null || true; }
 [ -f "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" ] && \
   { wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" /install /quiet /norestart /log C:\\dotnet-runtime-install.log 2>/dev/null || wine "$INST/windowsdesktop-runtime-8.0.28-win-x64.exe" 2>/dev/null || true; }
 echo "[4/4] Cài Medilab..."

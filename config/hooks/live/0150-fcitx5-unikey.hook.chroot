@@ -1,0 +1,114 @@
+#!/bin/bash
+# Hook: bộ gõ tiếng Việt Fcitx5 + UniKey.
+export DEBIAN_FRONTEND=noninteractive
+echo "[SenOS] === Bộ gõ tiếng Việt: Fcitx5 + UniKey ==="
+
+# Gỡ toàn bộ IBus/Bamboo và cấu hình cũ để tránh hiện 2 bộ gõ.
+apt-get purge -y 'ibus*' ibus-bamboo gir1.2-ibus-1.0 >/dev/null 2>&1 || true
+apt-get autoremove -y --purge >/dev/null 2>&1 || true
+rm -f /etc/xdg/autostart/ibus-bamboo.desktop \
+      /etc/xdg/autostart/senos-ibus-indicator.desktop \
+      /etc/environment.d/90-ibus.conf \
+      /etc/profile.d/90-ibus.sh \
+      /etc/dconf/db/local.d/02-ibus \
+      /etc/dconf/db/ibus.d/00-upstream-settings \
+      /etc/dconf/profile/ibus 2>/dev/null || true
+rm -f /usr/bin/senos-ibus-indicator 2>/dev/null || true
+rm -rf /usr/share/ibus /usr/share/ibus-bamboo /usr/lib/ibus /usr/libexec/ibus* 2>/dev/null || true
+
+apt-get update -y >/dev/null 2>&1 || true
+apt-get install -y --no-install-recommends \
+    fcitx5 \
+    fcitx5-unikey \
+    fcitx5-config-qt \
+    fcitx5-frontend-gtk2 \
+    fcitx5-frontend-gtk3 \
+    fcitx5-frontend-gtk4 \
+    fcitx5-frontend-qt5 \
+    fcitx5-module-xorg \
+    fcitx5-module-wayland \
+    fcitx5-module-quickphrase \
+    im-config || true
+
+# Đặt input method = fcitx cho toàn hệ thống.
+mkdir -p /etc/environment.d /etc/profile.d /etc/skel/.config/fcitx5
+cat > /etc/environment.d/90-fcitx5.conf <<'ENV'
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+QT4_IM_MODULE=fcitx
+CLUTTER_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+ENV
+cat > /etc/profile.d/90-fcitx5.sh <<'PROF'
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export QT4_IM_MODULE=fcitx
+export CLUTTER_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+PROF
+chmod 644 /etc/profile.d/90-fcitx5.sh
+
+for kv in GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx QT4_IM_MODULE=fcitx CLUTTER_IM_MODULE=fcitx XMODIFIERS=@im=fcitx; do
+    k="${kv%%=*}"
+    if grep -q "^${k}=" /etc/environment 2>/dev/null; then
+        sed -i "s|^${k}=.*|${kv}|" /etc/environment
+    else
+        echo "$kv" >> /etc/environment
+    fi
+done
+
+echo "run_im fcitx5" > /etc/skel/.xinputrc
+
+cat > /etc/skel/.config/fcitx5/profile <<'PROFILE'
+[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=unikey
+
+[Groups/0/Items/0]
+Name=keyboard-us
+Layout=
+
+[Groups/0/Items/1]
+Name=unikey
+Layout=
+
+[GroupOrder]
+0=Default
+PROFILE
+
+cat > /etc/skel/.config/fcitx5/config <<'CONFIG'
+[Hotkey]
+TriggerKeys=
+0=Control+space
+
+[Hotkey/EnumerateWithTriggerKeys]
+0=True
+CONFIG
+
+# Autostart rõ ràng cho mọi desktop. Fcitx5 tự hiện một icon tray duy nhất.
+mkdir -p /etc/xdg/autostart
+cat > /etc/xdg/autostart/senos-fcitx5.desktop <<'AUTO'
+[Desktop Entry]
+Type=Application
+Name=SenOS Vietnamese Input (Fcitx5)
+Name[vi]=Bộ gõ tiếng Việt SenOS (Fcitx5)
+Exec=sh -c 'fcitx5 -d'
+OnlyShowIn=GNOME;Unity;Cinnamon;MATE;XFCE;LXDE;
+X-GNOME-Autostart-Phase=Applications
+NoDisplay=true
+AUTO
+
+# Không dùng applet keyboard của Cinnamon; icon duy nhất là Fcitx5 trong systray.
+mkdir -p /etc/dconf/db/local.d
+cat > /etc/dconf/db/local.d/02-fcitx5 <<'DCONF'
+[org/cinnamon]
+enabled-applets=['panel1:left:0:Cinnamenu@json', 'panel1:left:1:grouped-window-list@cinnamon.org', 'panel1:right:0:network@cinnamon.org', 'panel1:right:1:sound@cinnamon.org', 'panel1:right:2:systray@cinnamon.org', 'panel1:right:3:xapp-status@cinnamon.org', 'panel1:right:4:weather@mockturtl', 'panel1:right:5:notifications@cinnamon.org', 'panel1:right:6:power@cinnamon.org', 'panel1:right:7:calendar@cinnamon.org', 'panel1:right:8:cornerbar@cinnamon.org']
+DCONF
+dconf update 2>/dev/null || true
+
+if dpkg -l fcitx5 fcitx5-unikey >/dev/null 2>&1; then
+    echo "[OK] Fcitx5 + UniKey đã cài (gõ tiếng Việt, chuyển bằng Ctrl+Space)."
+else
+    echo "[WARN] Fcitx5/UniKey chưa cài được — kiểm tra repo/mạng."
+fi

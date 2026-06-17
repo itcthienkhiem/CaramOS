@@ -41,7 +41,16 @@ step_repack_squashfs() {
 
     # Live ISO boot dùng build/custom/casper/initrd.lz, KHÔNG tự dùng file
     # /boot/initrd.img-* trong squashfs. Hook Plymouth đã regenerate initramfs
-    # trong rootfs, nên phải copy file mới này ra casper/initrd.lz.
+    # trong rootfs. Rebuild lại ở bước repack để các hook chạm vào casper.conf
+    # hoặc casper-bottom cũng chắc chắn được đóng vào initrd live.
+    if [ -x "$WORK_DIR/squashfs/usr/sbin/update-initramfs" ]; then
+        info "  → Cập nhật live initrd trong chroot..."
+        mount_chroot
+        chroot "$WORK_DIR/squashfs" update-initramfs -u -k all
+        umount_chroot
+    fi
+
+    # Copy file mới này ra casper/initrd.lz.
     local latest_initrd
     latest_initrd=$(ls -1t "$WORK_DIR"/squashfs/boot/initrd.img-* 2>/dev/null | head -1 || true)
     if [ -n "$latest_initrd" ] && [ -f "$latest_initrd" ]; then

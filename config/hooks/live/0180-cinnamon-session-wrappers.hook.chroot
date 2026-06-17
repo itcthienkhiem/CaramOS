@@ -1,0 +1,29 @@
+#!/bin/bash
+# Hook: giữ tương thích với file .desktop của Linux Mint/Cinnamon.
+set -e
+
+echo "[SenOS] === Cinnamon session wrappers ==="
+
+cat > /usr/bin/cinnamon-session-cinnamon <<'EOF'
+#!/bin/sh
+exec cinnamon-session --session=cinnamon "$@"
+EOF
+
+cat > /usr/bin/cinnamon-session-cinnamon2d <<'EOF'
+#!/bin/sh
+exec cinnamon-session --session=cinnamon2d "$@"
+EOF
+
+chmod 755 /usr/bin/cinnamon-session-cinnamon /usr/bin/cinnamon-session-cinnamon2d
+
+if [ -f /usr/share/xsessions/cinnamon.desktop ]; then
+    sed -i 's|^Exec=.*|Exec=cinnamon-session-cinnamon|' /usr/share/xsessions/cinnamon.desktop
+    sed -i 's|^TryExec=.*|TryExec=/usr/bin/cinnamon-session-cinnamon|' /usr/share/xsessions/cinnamon.desktop
+fi
+
+if [ -f /usr/share/xsessions/cinnamon2d.desktop ]; then
+    sed -i 's|^Exec=.*|Exec=cinnamon-session-cinnamon2d|' /usr/share/xsessions/cinnamon2d.desktop
+    sed -i 's|^TryExec=.*|TryExec=/usr/bin/cinnamon-session-cinnamon2d|' /usr/share/xsessions/cinnamon2d.desktop
+fi
+
+echo "[OK] Cinnamon session wrappers đã sẵn sàng."
