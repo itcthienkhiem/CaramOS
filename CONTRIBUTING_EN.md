@@ -1,6 +1,6 @@
-# Contributing Guide — CaramOS
+# Contributing Guide — SenOS
 
-Thank you for your interest in CaramOS! This document describes the project architecture, how to build the ISO, development workflow, and how to contribute.
+Thank you for your interest in SenOS! This document describes the project architecture, how to build the ISO, development workflow, and how to contribute.
 
 > [Tiếng Việt](CONTRIBUTING.md) · [README](README_EN.md)
 
@@ -19,7 +19,7 @@ Thank you for your interest in CaramOS! This document describes the project arch
 
 ## Project Architecture
 
-CaramOS = **Linux Mint** + **CaramOS customization**.
+SenOS = **Linux Mint** + **SenOS customization**.
 
 Built by **remastering the official Mint ISO**: extract → chroot → customize → repack.
 
@@ -30,13 +30,13 @@ Linux Mint ISO (Cinnamon 22)
 + Copy overlay files      (config/includes.chroot/)
 + Run hooks               (config/hooks/live/)
      ↓ mksquashfs + xorriso
-= CaramOS ISO
+= SenOS ISO
 ```
 
 ### Directory Structure
 
 ```
-CaramOS/
+SenOS/
 ├── build.sh                               # Entry point — orchestrates build
 ├── Makefile                               # make build / clean
 │
@@ -50,7 +50,7 @@ CaramOS/
 ├── config/
 │   ├── packages.txt                       # Extra packages to install
 │   ├── hooks/live/
-│   │   └── 0100-caramos-setup.hook.chroot # Chrome, theme, icons, cursor, locale
+│   │   └── 0100-senos-setup.hook.chroot # Chrome, theme, icons, cursor, locale
 │   └── includes.chroot/                   # Overlay → / (copied into filesystem)
 │       ├── etc/sddm.conf.d/              # SDDM login screen
 │       ├── etc/skel/.config/              # Default user config
@@ -91,8 +91,8 @@ CaramOS/
 
 Clone the repository:
 ```bash
-git clone https://github.com/VN-Linux-Family/CaramOS.git
-cd CaramOS
+git clone https://github.com/VN-Linux-Family/SenOS.git
+cd SenOS
 ```
 
 #### Local Build (Ubuntu/Mint)
@@ -116,18 +116,18 @@ make docker-build       # Build Dev mode (lz4)
 make docker-release     # Build Release mode (xz)
 ```
 
-Wait **1-10 minutes** (depending on lz4/xz) → `CaramOS-X.X-cinnamon-amd64.iso` is created.
+Wait **1-10 minutes** (depending on lz4/xz) → `SenOS-X.X-cinnamon-amd64.iso` is created.
 
 ### Write to USB
 
 ```bash
-sudo dd if=CaramOS-*.iso of=/dev/sdX bs=4M status=progress
+sudo dd if=SenOS-*.iso of=/dev/sdX bs=4M status=progress
 ```
 
 ### Test in VM
 
 ```bash
-qemu-system-x86_64 -m 4G -cdrom CaramOS-*.iso -boot d -enable-kvm
+qemu-system-x86_64 -m 4G -cdrom SenOS-*.iso -boot d -enable-kvm
 ```
 
 ### Clean up
@@ -191,7 +191,7 @@ brand:    wallpaper, logo, theme
 #!/bin/bash
 set -e
 
-echo "[CaramOS] Installing..."
+echo "[SenOS] Installing..."
 apt-get install -y package-name
 ```
 
@@ -199,7 +199,7 @@ apt-get install -y package-name
 
 ## Bug Reports & Feature Requests
 
-Create an [Issue on GitHub](https://github.com/VN-Linux-Family/CaramOS/issues):
+Create an [Issue on GitHub](https://github.com/VN-Linux-Family/SenOS/issues):
 
 **Bug report:** Description → Steps to reproduce → Expected result → System info
 
@@ -208,6 +208,6 @@ Create an [Issue on GitHub](https://github.com/VN-Linux-Family/CaramOS/issues):
 ---
 
 <p align="center">
-  <strong>CaramOS</strong> — Sweet & Simple Linux<br>
-  <a href="https://github.com/VN-Linux-Family/CaramOS">github.com/VN-Linux-Family/CaramOS</a>
+  <strong>SenOS</strong> — Sweet & Simple Linux<br>
+  <a href="https://github.com/VN-Linux-Family/SenOS">github.com/VN-Linux-Family/SenOS</a>
 </p>

@@ -1,0 +1,32 @@
+[org/cinnamon]
+app-menu-icon-name='/usr/share/pixmaps/senos-logo.png'
+system-icon='/usr/share/pixmaps/senos-logo.png'
+panels-enabled=['1:0:bottom']
+panels-autohide=['1:false']
+panels-height=['1:32']
+panel-zone-icon-sizes='[{"panelId": 1, "right": 18}]'
+panel-zone-symbolic-icon-sizes='[{"panelId": 1, "left": 20, "center": 20, "right": 20}]'
+
+[org/cinnamon/theme]
+name='Mint-Y'
+
+[org/cinnamon/desktop/interface]
+gtk-theme='Mint-Y'
+icon-theme='Tela-circle-light'
+cursor-theme='Bibata-Modern-Classic'
+font-name='Be Vietnam Pro 10'
+
+[org/cinnamon/desktop/wm/preferences]
+theme='Mint-Y'
+
+[org/gnome/desktop/interface]
+gtk-theme='Mint-Y'
+icon-theme='Tela-circle-light'
+cursor-theme='Bibata-Modern-Classic'
+font-name='Be Vietnam Pro 10'
+
+[org/gnome/desktop/wm/preferences]
+theme='Mint-Y'
+
+[org/cinnamon/applets/grouped-window-list]
+pinned-apps=['cinnamon-settings.desktop','wps-office-prometheus.desktop','google-chrome.desktop','mintinstall.desktop']

@@ -1,13 +1,13 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Install CaramOS
-Name[vi]=Cài đặt CaramOS
-Comment=Install CaramOS permanently to your disk
-Comment[vi]=Cài đặt CaramOS vào ổ đĩa
-Keywords=ubiquity;installer;caramos;
+Name=Install SenOS
+Name[vi]=Cài đặt SenOS
+Comment=Install SenOS permanently to your disk
+Comment[vi]=Cài đặt SenOS vào ổ đĩa
+Keywords=ubiquity;installer;senos;
 Exec=sudo --preserve-env=DBUS_SESSION_BUS_ADDRESS,XDG_DATA_DIRS,XDG_RUNTIME_DIR,GTK_THEME sh -c 'WEBKIT_DISABLE_COMPOSITING_MODE=1 ubiquity gtk_ui'
-Icon=caramos-logo
+Icon=senos-logo
 Terminal=false
 Categories=GTK;System;Settings;
 X-Ayatana-Appmenu-Show-Stubs=False

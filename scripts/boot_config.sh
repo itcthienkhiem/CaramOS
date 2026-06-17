@@ -1,6 +1,6 @@
 #!/bin/bash
 # Cấu hình bootloader + plymouth theo build mode:
-#   - Branding (Linux Mint → CaramOS): LUÔN áp dụng, cả dev lẫn release
+#   - Branding (Linux Mint → SenOS): LUÔN áp dụng, cả dev lẫn release
 #   - Dev/Release mode mặc định giữ quiet + splash để hiện Plymouth loading screen
 #   - Debug boot mode (--debug-boot) xoá quiet/splash khỏi kernel cmdline
 #
@@ -18,11 +18,11 @@ step_boot_config() {
         info "[2.5/7] Cấu hình boot đẹp (branding + Plymouth)..."
     fi
 
-    local BRAND_NAME="CaramOS"
-    local BRAND_VERSION="${CARAMOS_VERSION:-0.1}"
+    local BRAND_NAME="SenOS"
+    local BRAND_VERSION="${SENOS_VERSION:-0.1}"
     local BRAND_TITLE="${BRAND_NAME} ${BRAND_VERSION} ${MINT_EDITION^} 64-bit"
-    local LIVE_USER="caram"
-    local LIVE_HOST="caram"
+    local LIVE_USER="senos"
+    local LIVE_HOST="senos"
     local LIVE_LOCALE="vi_VN.UTF-8"
 
     local ISOLINUX_FILES
@@ -162,6 +162,6 @@ step_boot_config() {
         fi
     fi
 
-    info "  → Giữ Plymouth để hiện loading screen CaramOS."
+    info "  → Giữ Plymouth để hiện loading screen SenOS."
     ok "[2.5/7] Boot config xong."
 }

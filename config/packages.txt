@@ -1,4 +1,4 @@
-# CaramOS — Package cần THÊM vào ISO
+# SenOS — Package cần THÊM vào ISO
 # Mint ISO đã có: wifi, ethernet, bluetooth, linux-firmware
 # Chỉ thêm những gì Mint CHƯA CÓ
 

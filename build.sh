@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================================
-# CaramOS Build Script
-# Remaster từ Linux Mint ISO → CaramOS ISO
+# SenOS Build Script
+# Remaster từ Linux Mint ISO → SenOS ISO
 #
 # Usage:
 #   sudo ./build.sh                          # Dev build (lz4, nhanh)
@@ -58,7 +58,7 @@ case "$MODE" in
     clean)
         info "Dọn dẹp build..."
         safe_remove_work_dirs
-        rm -rf "$WORK_DIR/cache" "$WORK_DIR/cache_iso" CaramOS-*.iso ./*.log
+        rm -rf "$WORK_DIR/cache" "$WORK_DIR/cache_iso" SenOS-*.iso ./*.log
         ok "Đã dọn xong. (Mint ISO giữ lại)"
         exit 0
         ;;
@@ -102,9 +102,9 @@ trap cleanup_on_fail EXIT
 resolve_iso "$ISO_ARG"
 
 validate_customized_rootfs() {
-    [ -f "$WORK_DIR/squashfs/etc/caramos-customized" ] || return 1
+    [ -f "$WORK_DIR/squashfs/etc/senos-customized" ] || return 1
 
-    chroot "$WORK_DIR/squashfs" /bin/bash -c "test -f /etc/dconf/db/local && test -f /etc/xdg/autostart/caramos-theme.desktop && test -f /etc/xdg/autostart/plank.desktop && test -d /etc/skel/.config/plank/dock1 && test -d /usr/share/cinnamon/applets/Cinnamenu@json && find /usr/share/cinnamon/applets/Cinnamenu@json -name settings-schema.json -print -quit | grep -q . && test -f /usr/share/plymouth/themes/caramos/caramos.plymouth"
+    chroot "$WORK_DIR/squashfs" /bin/bash -c "test -f /etc/dconf/db/local && test -f /etc/xdg/autostart/senos-theme.desktop && test -f /etc/xdg/autostart/plank.desktop && test -d /etc/skel/.config/plank/dock1 && test -d /usr/share/cinnamon/applets/Cinnamenu@json && find /usr/share/cinnamon/applets/Cinnamenu@json -name settings-schema.json -print -quit | grep -q . && test -f /usr/share/plymouth/themes/senos/senos.plymouth"
 }
 
 # --- Header ---
@@ -149,7 +149,7 @@ case "$MODE" in
         step_boot_config
         if ! validate_customized_rootfs; then
             warn "Work tree chưa customize đầy đủ hoặc marker cũ không hợp lệ. Chạy customize trước khi repack."
-            rm -f "$WORK_DIR/squashfs/etc/caramos-customized" 2>/dev/null || true
+            rm -f "$WORK_DIR/squashfs/etc/senos-customized" 2>/dev/null || true
             step_customize
         else
             step_overlay

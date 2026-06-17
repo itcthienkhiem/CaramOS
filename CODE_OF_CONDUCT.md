@@ -1,8 +1,8 @@
-# Quy tắc ứng xử — CaramOS
+# Quy tắc ứng xử — SenOS
 
 ## Cam kết của chúng tôi
 
-CaramOS là dự án mã nguồn mở của cộng đồng [Vietnam Linux Family (VNLF)](https://vietnamlinuxfamily.net). Chúng tôi cam kết tạo một môi trường cởi mở, thân thiện, và tôn trọng cho tất cả mọi người, bất kể kinh nghiệm, giới tính, bản dạng giới, khuynh hướng tính dục, khuyết tật, ngoại hình, chủng tộc, dân tộc, tuổi tác, tôn giáo, hay quốc tịch.
+SenOS là dự án mã nguồn mở của cộng đồng [Vietnam Linux Family (VNLF)](https://vietnamlinuxfamily.net). Chúng tôi cam kết tạo một môi trường cởi mở, thân thiện, và tôn trọng cho tất cả mọi người, bất kể kinh nghiệm, giới tính, bản dạng giới, khuynh hướng tính dục, khuyết tật, ngoại hình, chủng tộc, dân tộc, tuổi tác, tôn giáo, hay quốc tịch.
 
 ## Tiêu chuẩn
 
@@ -26,11 +26,11 @@ CaramOS là dự án mã nguồn mở của cộng đồng [Vietnam Linux Family
 
 ## Phạm vi áp dụng
 
-Quy tắc này áp dụng trong tất cả các không gian của dự án: GitHub (Issues, Pull Requests, Discussions), kênh chat, sự kiện, và mọi nơi mà thành viên đại diện cho dự án CaramOS.
+Quy tắc này áp dụng trong tất cả các không gian của dự án: GitHub (Issues, Pull Requests, Discussions), kênh chat, sự kiện, và mọi nơi mà thành viên đại diện cho dự án SenOS.
 
 ## Thực thi
 
-Các trường hợp vi phạm có thể được báo cáo qua [Issues](https://github.com/VN-Linux-Family/CaramOS/issues) hoặc liên hệ trực tiếp với đội ngũ quản lý dự án. Mọi báo cáo sẽ được xem xét và xử lý phù hợp.
+Các trường hợp vi phạm có thể được báo cáo qua [Issues](https://github.com/VN-Linux-Family/SenOS/issues) hoặc liên hệ trực tiếp với đội ngũ quản lý dự án. Mọi báo cáo sẽ được xem xét và xử lý phù hợp.
 
 Đội ngũ quản lý có quyền xoá, chỉnh sửa, hoặc từ chối comment, commit, code, issue, và các đóng góp khác không phù hợp với quy tắc ứng xử này.
 
@@ -41,6 +41,6 @@ Quy tắc này được điều chỉnh từ [Contributor Covenant](https://www.
 ---
 
 <p align="center">
-  <strong>CaramOS</strong> — Sweet & Simple Linux<br>
-  <a href="https://github.com/VN-Linux-Family/CaramOS">github.com/VN-Linux-Family/CaramOS</a>
+  <strong>SenOS</strong> — Sweet & Simple Linux<br>
+  <a href="https://github.com/VN-Linux-Family/SenOS">github.com/VN-Linux-Family/SenOS</a>
 </p>

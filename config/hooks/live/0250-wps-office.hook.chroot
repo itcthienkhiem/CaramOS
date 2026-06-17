@@ -19,28 +19,28 @@ _get_wps_url() {
 }
 
 if command -v wps >/dev/null 2>&1 && [ -d /opt/kingsoft/wps-office ]; then
-    echo "[CaramOS] WPS Office already installed; applying cleanup only."
+    echo "[SenOS] WPS Office already installed; applying cleanup only."
 else
-    echo "[CaramOS] Downloading WPS Office ${WPS_VER}..."
+    echo "[SenOS] Downloading WPS Office ${WPS_VER}..."
     WPS_URL=$(_get_wps_url amd64)
     wget --tries=3 --timeout=60 --progress=dot:giga -O "$WPS_DEB" "$WPS_URL" || true
 
     if [ ! -s "$WPS_DEB" ] || ! file "$WPS_DEB" | grep -qi "Debian binary package"; then
-        echo "[CaramOS] WARNING: Could not download WPS Office" >&2
+        echo "[SenOS] WARNING: Could not download WPS Office" >&2
         rm -f "$WPS_DEB"
         exit 0
     fi
 
-    echo "[CaramOS] Installing WPS Office directly..."
+    echo "[SenOS] Installing WPS Office directly..."
     "${APT_GET[@]}" install -y "$WPS_DEB" || "${APT_GET[@]}" install -f -y
 fi
 
-echo "[CaramOS] Removing zh_CN MUI..."
+echo "[SenOS] Removing zh_CN MUI..."
 rm -rf /opt/kingsoft/wps-office/office6/mui/zh_CN
 
-echo "[CaramOS] Removing wtool (update mechanism)..."
+echo "[SenOS] Removing wtool (update mechanism)..."
 rm -rf /opt/kingsoft/wps-office/office6/wtool
 
 rm -f "$WPS_DEB"
 
-echo "[CaramOS] WPS Office installed successfully!"
+echo "[SenOS] WPS Office installed successfully!"

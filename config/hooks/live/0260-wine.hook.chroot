@@ -1,0 +1,37 @@
+#!/bin/bash
+# Hook: cài Wine MỚI NHẤT từ kho WineHQ chính thức (winehq-stable).
+# Không dùng `set -e` để lỗi tải repo không làm hỏng toàn bộ build.
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[SenOS] === Cài Wine (WineHQ stable - bản mới nhất) ==="
+
+# SenOS dựa trên Ubuntu 24.04 LTS (noble)
+WINE_CODENAME="noble"
+
+# Wine cần kiến trúc 32-bit
+dpkg --add-architecture i386
+
+mkdir -pm755 /etc/apt/keyrings
+
+if wget -q -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key; then
+    wget -q -NP /etc/apt/sources.list.d/ \
+        "https://dl.winehq.org/wine-builds/ubuntu/dists/${WINE_CODENAME}/winehq-${WINE_CODENAME}.sources" \
+        || echo "[WARN] Không tải được file .sources WineHQ"
+    apt-get update -y || true
+    if apt-get install -y --install-recommends winehq-stable; then
+        echo "[OK] Wine (WineHQ stable): $(wine --version 2>/dev/null || echo 'đã cài')"
+    else
+        echo "[WARN] winehq-stable lỗi — fallback sang wine của Ubuntu."
+        apt-get install -f -y || true
+        apt-get install -y --install-recommends wine wine64 wine32 2>/dev/null || true
+    fi
+else
+    echo "[WARN] Không tải được khoá WineHQ — fallback sang wine của Ubuntu."
+    apt-get update -y || true
+    apt-get install -y --install-recommends wine wine64 wine32 2>/dev/null || true
+fi
+
+# Tiện ích cấu hình Wine (tùy chọn)
+apt-get install -y winetricks 2>/dev/null || true
+
+echo "[SenOS] === Wine xong ==="

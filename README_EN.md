@@ -1,32 +1,32 @@
 <p align="center">
-  <img src="assets/CaramOS_logo.png" alt="CaramOS Logo" width="250">
+  <img src="assets/SenOS_logo.png" alt="SenOS Logo" width="250">
 </p>
 
-<h1 align="center">CaramOS</h1>
+<h1 align="center">SenOS</h1>
 
 <p align="center">
-  <strong>Sweet & Simple Linux — A Linux distro made for Vietnamese users</strong>
-</p>
-
-<p align="center">
-  <em>Caram = Carambola — the starfruit, whose 5 points mirror the star on Vietnam's flag, a fruit tied to every Vietnamese childhood</em>
+  <strong>Simple Vietnamese Linux — A Linux distro made for Vietnamese users</strong>
 </p>
 
 <p align="center">
-  <a href="README.md">Tiếng Việt</a> · <a href="https://vietnamlinuxfamily.net">VNLF</a> · <a href="https://caramos.vietnamlinuxfamily.net">Website</a>
+  <em>SenOS — a product of <a href="https://aksoft.vn">AkSoft</a>, bringing Linux closer to Vietnamese users</em>
+</p>
+
+<p align="center">
+  <a href="README.md">Tiếng Việt</a> · <a href="https://vietnamlinuxfamily.net">VNLF</a> · <a href="https://senos.vietnamlinuxfamily.net">Website</a>
 </p>
 
 ---
 
-### What is CaramOS?
+### What is SenOS?
 
-**CaramOS** is a Linux distribution based on [Linux Mint](https://linuxmint.com/), designed specifically for **Vietnamese users**. The name comes from *Carambola* — the starfruit. Its 5-pointed cross-section mirrors the star on Vietnam's flag, and it is a fruit deeply tied to Vietnamese childhood and culture.
+**SenOS** is a Linux distribution based on [Linux Mint](https://linuxmint.com/), designed specifically for **Vietnamese users**. SenOS is a product of [AkSoft](https://aksoft.vn), built to make Linux simple and approachable for everyday Vietnamese users switching from Windows.
 
 > [!IMPORTANT]
 > **Current version:** `1.0.1` — **Open Beta**.
-> CaramOS is currently in open beta to gather feedback from the community.
+> SenOS is currently in open beta to gather feedback from the community.
 > We warmly welcome all suggestions, bug reports, UI/package improvements,
-> installation experience feedback, and ideas that can make CaramOS friendlier
+> installation experience feedback, and ideas that can make SenOS friendlier
 > for Vietnamese users and the wider Linux community.
 
 > Our mission is to **make Linux accessible for everyone** — everything is kept as simple as possible, software comes pre-installed and ready to use, and we strive to bring familiar Windows applications to our users.
@@ -36,7 +36,7 @@
 | Feature | Description |
 |---|---|
 | **Chrome OS-style UI** | Clean, modern, rounded icons, grid launcher |
-| **Caram Center** | One-click Windows app installer (Zalo, Photoshop, Office, games) |
+| **SenOS Center** | One-click Windows app installer (Zalo, Photoshop, Office, games) |
 | **Vietnamese-first** | Vietnamese locale by default, fcitx5-lotus input method, Vietnamese fonts |
 | **Offline AI** | Local AI assistant — chat, translate, summarize, spell-check |
 | **Safe updates** | mintupdate with risk-level classification — never breaks your system |
@@ -46,34 +46,34 @@
 | **Lightweight** | Runs smoothly on low-spec hardware |
 
 <p align="center">
-  <img src="assets/caramos_vietnam_banner.png" alt="CaramOS Open Beta banner" width="900">
+  <img src="assets/senos_vietnam_banner.png" alt="SenOS Open Beta banner" width="900">
 </p>
 
-### CaramOS Experience
+### SenOS Experience
 
-From boot menu to desktop, CaramOS is consistently branded to feel friendly,
+From boot menu to desktop, SenOS is consistently branded to feel friendly,
 modern, and ready for Vietnamese users out of the box.
 
 | Step | Screenshot |
 |---|---|
-| **1. GRUB boot menu**<br>Select the live session or start the installer. | <img src="assets/screenshots/01-grub-menu.png" alt="CaramOS GRUB boot menu" width="420"> |
-| **2. Startup loading**<br>Customized Plymouth startup branding. | <img src="assets/screenshots/02-startup-loading.png" alt="CaramOS startup loading screen" width="420"> |
-| **3. Desktop**<br>Cinnamon desktop with CaramOS theme, icons, panel, and wallpaper. | <img src="assets/screenshots/03-desktop.png" alt="CaramOS Cinnamon desktop" width="420"> |
-| **4. Neofetch**<br>CaramOS system identity shown directly in the terminal. | <img src="assets/screenshots/04-neofetch.png" alt="CaramOS neofetch output" width="420"> |
+| **1. GRUB boot menu**<br>Select the live session or start the installer. | <img src="assets/screenshots/01-grub-menu.png" alt="SenOS GRUB boot menu" width="420"> |
+| **2. Startup loading**<br>Customized Plymouth startup branding. | <img src="assets/screenshots/02-startup-loading.png" alt="SenOS startup loading screen" width="420"> |
+| **3. Desktop**<br>Cinnamon desktop with SenOS theme, icons, panel, and wallpaper. | <img src="assets/screenshots/03-desktop.png" alt="SenOS Cinnamon desktop" width="420"> |
+| **4. Neofetch**<br>SenOS system identity shown directly in the terminal. | <img src="assets/screenshots/04-neofetch.png" alt="SenOS neofetch output" width="420"> |
 
 ### Installation
 
-1. Download ISO from [caramos.vietnamlinuxfamily.net](https://caramos.vietnamlinuxfamily.net)
+1. Download ISO from [senos.vietnamlinuxfamily.net](https://senos.vietnamlinuxfamily.net)
 2. Flash to USB with [Balena Etcher](https://etcher.balena.io) or `dd`
 3. Boot from USB, follow the installer (available in Vietnamese & English)
 
-### Caram Center — Windows Apps Made Easy
+### SenOS Center — Windows Apps Made Easy
 
-Caram Center is CaramOS's signature application that routes users to the right engine behind the scenes:
+SenOS Center is SenOS's signature application that routes users to the right engine behind the scenes:
 
 ```
 +------------------------------------------+
-|            Caram Center                   |
+|            SenOS Center                   |
 +----------+----------+--------------------+
 |   Apps   |  Games   |   Web Apps         |
 +----------+----------+--------------------+
@@ -116,8 +116,8 @@ sudo apt install squashfs-tools xorriso rsync wget curl isolinux syslinux-common
 Clone the repository and run a dev build:
 
 ```bash
-git clone git@github.com:VN-Linux-Family/CaramOS.git
-cd CaramOS
+git clone git@github.com:VN-Linux-Family/SenOS.git
+cd SenOS
 make build
 ```
 
@@ -165,25 +165,25 @@ We welcome contributions! See [CONTRIBUTING_EN.md](CONTRIBUTING_EN.md) for guide
 5. Create a Pull Request
 
 **You can help with:**
-- Bug reports and feature suggestions via [Issues](https://github.com/VN-Linux-Family/CaramOS/issues)
+- Bug reports and feature suggestions via [Issues](https://github.com/VN-Linux-Family/SenOS/issues)
 - Wallpaper, icon, and theme design
 - Testing on different hardware
 - Documentation and translations
-- Writing Windows app install scripts for Caram Center
+- Writing Windows app install scripts for SenOS Center
 
 ### Contributors
 
-Thanks to everyone who has contributed to CaramOS on GitHub.
+Thanks to everyone who has contributed to SenOS on GitHub.
 
 <p align="center">
-  <a href="https://github.com/VN-Linux-Family/CaramOS/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=VN-Linux-Family/CaramOS" alt="CaramOS GitHub contributors">
+  <a href="https://github.com/VN-Linux-Family/SenOS/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=VN-Linux-Family/SenOS" alt="SenOS GitHub contributors">
   </a>
 </p>
 
 ### License
 
-CaramOS is open-source software licensed under [GPL-3.0](LICENSE).
+SenOS is open-source software licensed under [GPL-3.0](LICENSE).
 
 ### Acknowledgments
 
@@ -197,6 +197,6 @@ CaramOS is open-source software licensed under [GPL-3.0](LICENSE).
 ---
 
 <p align="center">
-  <strong>CaramOS</strong> — Sweet & Simple Linux<br>
+  <strong>SenOS</strong> — Simple Vietnamese Linux<br>
   Made with love by <a href="https://vietnamlinuxfamily.net">Vietnam Linux Family</a>
 </p>

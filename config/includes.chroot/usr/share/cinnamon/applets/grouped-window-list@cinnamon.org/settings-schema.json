@@ -153,9 +153,10 @@
   "pinned-apps": {
     "type": "generic",
     "default": [
-      "google-chrome.desktop",
+      "cinnamon-settings.desktop",
       "wps-office-prometheus.desktop",
-      "cinnamon-settings.desktop"
+      "google-chrome.desktop",
+      "mintinstall.desktop"
     ]
   },
   "group-apps": {

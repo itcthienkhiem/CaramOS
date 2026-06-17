@@ -23,7 +23,7 @@ info()  {
     if $HAS_GUM; then
         gum log --level info "$1"
     else
-        echo -e "${CYAN}[CaramOS]${NC} $1"
+        echo -e "${CYAN}[SenOS]${NC} $1"
     fi
 }
 
@@ -70,14 +70,14 @@ print_header() {
         gum style \
             --border rounded --border-foreground 212 \
             --padding "1 3" --margin "1 0" --bold \
-            "🍬 CaramOS ${CARAMOS_VERSION}" \
+            "🍬 SenOS ${SENOS_VERSION}" \
             "" \
             "Input:  ${MINT_ISO}" \
             "Output: ${OUTPUT_ISO}"
     else
         echo ""
         echo "============================================"
-        echo -e "  ${CYAN}CaramOS ${CARAMOS_VERSION}${NC} — Build từ Linux Mint"
+        echo -e "  ${CYAN}SenOS ${SENOS_VERSION}${NC} — Build từ Linux Mint"
         echo "============================================"
         echo "  Input:  $MINT_ISO"
         echo "  Output: $OUTPUT_ISO"
@@ -219,7 +219,7 @@ safe_remove_work_dirs() {
 
 print_dev_help() {
     cat <<EOF
-CaramOS Dev Build Modes:
+SenOS Dev Build Modes:
   sudo ./build.sh --prepare        Tạo build/squashfs + build/custom, giữ để sửa nhanh
   sudo ./build.sh --boot-only      Chỉ áp dụng boot config/branding
   sudo ./build.sh --overlay-only   Chỉ copy config/includes.chroot vào rootfs

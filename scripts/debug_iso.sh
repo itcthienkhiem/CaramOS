@@ -4,11 +4,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$SCRIPT_DIR"
 
-ISO="${1:-CaramOS-0.1-cinnamon-amd64.iso}"
+ISO="${1:-SenOS-0.1-cinnamon-amd64.iso}"
 WORK_CUSTOM="build/custom"
 ROOTFS="build/squashfs"
 
-echo "== CaramOS ISO debug =="
+echo "== SenOS ISO debug =="
 echo "ISO: $ISO"
 echo
 
@@ -65,8 +65,8 @@ if [ -d "$ROOTFS/usr/share/plymouth/themes" ]; then
         echo "resolved: ${RESOLVED#$ROOTFS}"
         grep -RIn "Name=\|ImageDir=" "$RESOLVED" 2>/dev/null || true
     fi
-    grep -RIn "Name=\|ImageDir=" "$ROOTFS/usr/share/plymouth/themes/caramos"/*.plymouth 2>/dev/null || true
-    [ -f "$ROOTFS/usr/share/plymouth/themes/caramos/watermark.png" ] && file "$ROOTFS/usr/share/plymouth/themes/caramos/watermark.png" || true
+    grep -RIn "Name=\|ImageDir=" "$ROOTFS/usr/share/plymouth/themes/senos"/*.plymouth 2>/dev/null || true
+    [ -f "$ROOTFS/usr/share/plymouth/themes/senos/watermark.png" ] && file "$ROOTFS/usr/share/plymouth/themes/senos/watermark.png" || true
 else
     echo "MISSING: plymouth themes"
 fi
@@ -76,8 +76,8 @@ echo "== Live initrd =="
 INITRD="$WORK_CUSTOM/casper/initrd.lz"
 if [ -f "$INITRD" ]; then
     ls -lh "$INITRD"
-    echo "CaRamOS entries:"
-    lsinitramfs "$INITRD" 2>/dev/null | grep -E 'usr/share/plymouth/themes/caramos|etc/alternatives/default.plymouth|usr/share/plymouth/themes/default.plymouth' | head -80 || true
+    echo "SenOS entries:"
+    lsinitramfs "$INITRD" 2>/dev/null | grep -E 'usr/share/plymouth/themes/senos|etc/alternatives/default.plymouth|usr/share/plymouth/themes/default.plymouth' | head -80 || true
     echo "Mint/BGRT entries:"
     lsinitramfs "$INITRD" 2>/dev/null | grep -E 'usr/share/plymouth/themes/(mint-logo|bgrt)' | head -20 || true
 else

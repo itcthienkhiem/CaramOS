@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir -p sourceforge-test
           cat > sourceforge-test/github-actions-upload-test.txt <<EOF
-          CaramOS SourceForge upload test
+          SenOS SourceForge upload test
           Repository: ${GITHUB_REPOSITORY}
           Run ID: ${GITHUB_RUN_ID}
           Commit: ${GITHUB_SHA}

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SenOS Theme Applier
+Comment=Apply custom themes on first boot
+Exec=/usr/bin/senos-theme-apply
+AutostartCondition=unless-exists .config/senos-theme-applied
+X-GNOME-Autostart-Phase=Desktop
+NoDisplay=true

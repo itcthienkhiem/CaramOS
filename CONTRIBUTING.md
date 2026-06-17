@@ -1,6 +1,6 @@
-# Hướng dẫn đóng góp — CaramOS
+# Hướng dẫn đóng góp — SenOS
 
-Cảm ơn bạn đã quan tâm đến CaramOS! Tài liệu này mô tả kiến trúc dự án, cách build ISO, quy trình phát triển, và cách đóng góp.
+Cảm ơn bạn đã quan tâm đến SenOS! Tài liệu này mô tả kiến trúc dự án, cách build ISO, quy trình phát triển, và cách đóng góp.
 
 > [README tiếng Việt](README.md) · [English](CONTRIBUTING_EN.md)
 
@@ -19,7 +19,7 @@ Cảm ơn bạn đã quan tâm đến CaramOS! Tài liệu này mô tả kiến 
 
 ## Kiến trúc dự án
 
-CaramOS = **Linux Mint** + **CaramOS customization**.
+SenOS = **Linux Mint** + **SenOS customization**.
 
 Build bằng cách **remaster ISO Mint gốc**: extract → chroot → tuỳ biến → đóng gói ISO mới.
 
@@ -30,13 +30,13 @@ Linux Mint ISO (Cinnamon 22)
 + Copy overlay files    (config/includes.chroot/)
 + Chạy hooks            (config/hooks/live/)
      ↓ mksquashfs + xorriso
-= CaramOS ISO
+= SenOS ISO
 ```
 
 ### Cấu trúc thư mục
 
 ```
-CaramOS/
+SenOS/
 ├── build.sh                               # Entry point — điều phối build
 ├── Makefile                               # make build / clean
 │
@@ -50,7 +50,7 @@ CaramOS/
 ├── config/
 │   ├── packages.txt                       # Package CẦN THÊM (Mint ISO đã có hầu hết)
 │   ├── hooks/live/
-│   │   └── 0100-caramos-setup.hook.chroot # Chrome, theme, icon, cursor, locale
+│   │   └── 0100-senos-setup.hook.chroot # Chrome, theme, icon, cursor, locale
 │   └── includes.chroot/                   # Overlay → / (copy vào filesystem)
 │       ├── etc/sddm.conf.d/              # SDDM login screen
 │       ├── etc/skel/.config/              # Config mặc định user mới
@@ -60,7 +60,7 @@ CaramOS/
 │       │   └── mimeapps.list              # Chrome mặc định
 │       └── usr/share/
 │           ├── glib-2.0/schemas/          # Dconf (theme, icon, font...)
-│           ├── backgrounds/caramos/       # Hình nền
+│           ├── backgrounds/senos/       # Hình nền
 │           └── pixmaps/                   # Logo
 │
 ├── debian/                                # Debian packaging → .deb
@@ -81,7 +81,7 @@ CaramOS/
 
 ### Hook — Chạy gì trong chroot
 
-**`0100-caramos-setup.hook.chroot`:**
+**`0100-senos-setup.hook.chroot`:**
 - Cài Google Chrome (.deb)
 - Cài ChromeOS GTK theme, Tela Circle icons, Bibata cursor
 - Gỡ bloatware (Thunderbird, Hexchat...)
@@ -116,8 +116,8 @@ CaramOS/
 
 Clone repo về máy:
 ```bash
-git clone https://github.com/VN-Linux-Family/CaramOS.git
-cd CaramOS
+git clone https://github.com/VN-Linux-Family/SenOS.git
+cd SenOS
 ```
 
 #### Build Local (Ubuntu/Mint)
@@ -141,19 +141,19 @@ make docker-build       # Build Dev mode (lz4)
 make docker-release     # Build Release mode (xz)
 ```
 
-Chờ **1-10 phút** (tuỳ chọn nén lz4/xz) → ra file `CaramOS-X.X-cinnamon-amd64.iso`
+Chờ **1-10 phút** (tuỳ chọn nén lz4/xz) → ra file `SenOS-X.X-cinnamon-amd64.iso`
 
 ### Ghi USB
 
 ```bash
-sudo dd if=CaramOS-*.iso of=/dev/sdX bs=4M status=progress
+sudo dd if=SenOS-*.iso of=/dev/sdX bs=4M status=progress
 # Hoặc dùng Balena Etcher (GUI)
 ```
 
 ### Test trong VM
 
 ```bash
-qemu-system-x86_64 -m 4G -cdrom CaramOS-*.iso -boot d -enable-kvm
+qemu-system-x86_64 -m 4G -cdrom SenOS-*.iso -boot d -enable-kvm
 # Hoặc dùng VirtualBox / GNOME Boxes
 ```
 
@@ -203,7 +203,7 @@ main            ← Bản ổn định, build ISO phát hành
 ### Versioning — Semantic Versioning
 
 ```
-CaramOS X.Y.Z
+SenOS X.Y.Z
 X = Major   Y = Minor   Z = Patch
 ```
 
@@ -228,7 +228,7 @@ brand:    wallpaper, logo, theme
 set -e
 
 # Comment giải thích mỗi block
-echo "[CaramOS] Installing..."
+echo "[SenOS] Installing..."
 apt-get install -y package-name
 ```
 
@@ -236,7 +236,7 @@ apt-get install -y package-name
 
 ## Báo lỗi & đề xuất
 
-Tạo [Issue trên GitHub](https://github.com/VN-Linux-Family/CaramOS/issues):
+Tạo [Issue trên GitHub](https://github.com/VN-Linux-Family/SenOS/issues):
 
 **Báo lỗi:** Mô tả lỗi → Cách tái hiện → Kết quả mong đợi → Thông tin hệ thống → Log/ảnh
 
@@ -245,6 +245,6 @@ Tạo [Issue trên GitHub](https://github.com/VN-Linux-Family/CaramOS/issues):
 ---
 
 <p align="center">
-  <strong>CaramOS</strong> — Sweet & Simple Linux<br>
-  <a href="https://github.com/VN-Linux-Family/CaramOS">github.com/VN-Linux-Family/CaramOS</a>
+  <strong>SenOS</strong> — Sweet & Simple Linux<br>
+  <a href="https://github.com/VN-Linux-Family/SenOS">github.com/VN-Linux-Family/SenOS</a>
 </p>

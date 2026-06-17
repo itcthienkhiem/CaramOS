@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="770" height="160" viewBox="0 0 770 160">
+  <g transform="translate(80,80) scale(0.74) translate(-100,-104)"><path d="M24.3,137.1 L72.8,116.2 L98.1,155.5 L57.3,178.3 Z" fill="#ff5d73" fill-opacity="0.4"/><path d="M175.7,137.1 L142.7,178.3 L101.9,155.5 L127.2,116.2 Z" fill="#b07bff" fill-opacity="0.4"/><path d="M16.6,69.7 L78.1,113.2 L98.6,154.6 L58.0,132.6 Z" fill="#ff5d73"/><path d="M55.0,44.7 L95.7,108.1 L99.3,154.1 L69.8,118.6 Z" fill="#ffb13d"/><path d="M100.0,36.0 L114.0,110.0 L100.0,154.0 L86.0,110.0 Z" fill="#39d98a"/><path d="M145.0,44.7 L130.2,118.6 L100.7,154.1 L104.3,108.1 Z" fill="#34c6ff"/><path d="M183.4,69.7 L142.0,132.6 L101.4,154.6 L121.9,113.2 Z" fill="#b07bff"/></g>
+  <text x="180" y="80" dy="0.34em" font-family="Segoe UI, Be Vietnam Pro, DejaVu Sans, sans-serif" font-weight="900" font-size="78" fill="#ffffff">SenOS</text>
+</svg>

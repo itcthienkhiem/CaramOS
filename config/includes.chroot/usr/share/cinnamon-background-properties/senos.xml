@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>SenOS Light</name>
+    <filename>/usr/share/backgrounds/senos/senos-light.png</filename>
+    <options>zoom</options>
+    <pcolor>#eceef2</pcolor>
+    <scolor>#eceef2</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>SenOS Light Plain</name>
+    <filename>/usr/share/backgrounds/senos/senos-light-plain.png</filename>
+    <options>zoom</options>
+    <pcolor>#eceef2</pcolor>
+    <scolor>#eceef2</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>SenOS Aurora</name>
+    <filename>/usr/share/backgrounds/senos/aurora.png</filename>
+    <options>zoom</options>
+    <pcolor>#0c0d18</pcolor>
+    <scolor>#0c0d18</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>SenOS Bloom</name>
+    <filename>/usr/share/backgrounds/senos/bloom.png</filename>
+    <options>zoom</options>
+    <pcolor>#0c0d18</pcolor>
+    <scolor>#0c0d18</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>SenOS Facet</name>
+    <filename>/usr/share/backgrounds/senos/facet.png</filename>
+    <options>zoom</options>
+    <pcolor>#0c0d18</pcolor>
+    <scolor>#0c0d18</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+</wallpapers>

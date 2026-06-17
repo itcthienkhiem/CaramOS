@@ -4,11 +4,11 @@ export DEBIAN_FRONTEND=noninteractive
 APT_LOCK_TIMEOUT="${APT_LOCK_TIMEOUT:-600}"
 APT_GET=(apt-get -o DPkg::Lock::Timeout="${APT_LOCK_TIMEOUT}")
 
-echo "[CaramOS] Removing old fcitx5 packages..."
+echo "[SenOS] Removing old fcitx5 packages..."
 "${APT_GET[@]}" remove -y fcitx5 fcitx5-unikey 2>/dev/null || true
 "${APT_GET[@]}" autoremove -y 2>/dev/null || true
 
-echo "[CaramOS] Installing fcitx5-lotus..."
+echo "[SenOS] Installing fcitx5-lotus..."
 CODENAME=$(grep '^UBUNTU_CODENAME=' /etc/os-release | cut -d'=' -f2)
 if [ -z "$CODENAME" ]; then
     CODENAME=noble
@@ -25,7 +25,7 @@ printf 'deb [signed-by=/etc/apt/keyrings/fcitx5-lotus.gpg] https://fcitx5-lotus.
 "${APT_GET[@]}" install -y fcitx5-lotus fcitx5-config-qt fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 fcitx5-frontend-qt5 im-config
 
 mkdir -p /etc/profile.d /etc/xdg/autostart /etc/skel/.config/fcitx5/conf /etc/skel/.config/environment.d
-cat > /etc/profile.d/caramos-fcitx5.sh <<'ENV'
+cat > /etc/profile.d/senos-fcitx5.sh <<'ENV'
 #!/bin/sh
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
@@ -35,7 +35,7 @@ export SDL_IM_MODULE=fcitx
 # Lotus upstream notes GLFW should keep ibus for compatibility.
 export GLFW_IM_MODULE=ibus
 ENV
-chmod 644 /etc/profile.d/caramos-fcitx5.sh
+chmod 644 /etc/profile.d/senos-fcitx5.sh
 
 cat > /etc/skel/.config/environment.d/90-fcitx5-lotus.conf <<'ENVCONF'
 GTK_IM_MODULE=fcitx
@@ -68,7 +68,7 @@ Layout=
 PROFILE
 
 cat > /etc/skel/.config/fcitx5/conf/lotus.conf <<'LOTUSCONF'
-# CaramOS defaults for Lotus.
+# SenOS defaults for Lotus.
 # Values match the Lotus settings UI labels.
 InputMethod="Telex"
 Mode="Preedit"
@@ -106,7 +106,7 @@ if [ -f /etc/xdg/autostart/ibus-daemon.desktop ]; then
     mv -f /etc/xdg/autostart/ibus-daemon.desktop /etc/xdg/autostart-disabled/ibus-daemon.desktop
 fi
 
-cat > /usr/local/bin/caramos-fcitx5-lotus-enable <<'HELPER'
+cat > /usr/local/bin/senos-fcitx5-lotus-enable <<'HELPER'
 #!/bin/sh
 set -eu
 
@@ -128,7 +128,7 @@ mkdir -p "${HOME}/.config/fcitx5/conf" "${HOME}/.config/environment.d"
 if [ -d "${HOME}/.config/fcitx5/profile" ]; then
     rm -rf "${HOME}/.config/fcitx5/profile"
 fi
-# Always enforce the CaramOS defaults on login so the session starts with Lotus
+# Always enforce the SenOS defaults on login so the session starts with Lotus
 # selected and the global Lotus mode is Preedit.
 cp -f /etc/skel/.config/fcitx5/profile "${HOME}/.config/fcitx5/profile"
 cp -f /etc/skel/.config/fcitx5/conf/lotus.conf "${HOME}/.config/fcitx5/conf/lotus.conf"
@@ -141,16 +141,16 @@ if command -v fcitx5 >/dev/null 2>&1 && ! pgrep -u "$(id -u)" -x fcitx5 >/dev/nu
     fcitx5 -d --replace >/dev/null 2>&1 || true
 fi
 HELPER
-chmod 755 /usr/local/bin/caramos-fcitx5-lotus-enable
+chmod 755 /usr/local/bin/senos-fcitx5-lotus-enable
 
-cat > /etc/xdg/autostart/caramos-fcitx5-lotus-enable.desktop <<'DESKTOP'
+cat > /etc/xdg/autostart/senos-fcitx5-lotus-enable.desktop <<'DESKTOP'
 [Desktop Entry]
 Type=Application
 Name=Enable Fcitx5 Lotus
 Name[vi]=Kích hoạt Fcitx5 Lotus
 Comment=Prepare Lotus input method for this live session
 Comment[vi]=Chuẩn bị bộ gõ Lotus cho phiên live này
-Exec=/usr/local/bin/caramos-fcitx5-lotus-enable
+Exec=/usr/local/bin/senos-fcitx5-lotus-enable
 Terminal=false
 NoDisplay=true
 X-GNOME-Autostart-enabled=true
@@ -160,4 +160,4 @@ X-GNOME-Autostart-Notify=false
 OnlyShowIn=X-Cinnamon;GNOME;MATE;XFCE;LXQt;KDE;
 DESKTOP
 
-echo "[CaramOS] fcitx5-lotus installed and enabled successfully!"
+echo "[SenOS] fcitx5-lotus installed and enabled successfully!"

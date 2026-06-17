@@ -8,19 +8,21 @@ MINT_ISO_NAME="linuxmint-${MINT_VERSION}-${MINT_EDITION}-${MINT_ARCH}.iso"
 if [ "$GITHUB_ACTIONS" = "true" ]; then
     MINT_MIRROR="https://mirrors.kernel.org/linuxmint/stable/${MINT_VERSION}/${MINT_ISO_NAME}"
 else
-    MINT_MIRROR="https://mirror.meowsmp.net/linuxmint/iso/stable/${MINT_VERSION}/${MINT_ISO_NAME}"
+    MINT_MIRROR="https://mirror.clearsky.vn/linuxmint/iso/stable/${MINT_VERSION}/${MINT_ISO_NAME}"
+    # Dự phòng nếu mirror VN lỗi:
+    # MINT_MIRROR="https://mirrors.edge.kernel.org/linuxmint/stable/${MINT_VERSION}/${MINT_ISO_NAME}"
 fi
 
-# CaramOS version — source of truth, giống cách Linux kernel khai báo trong Makefile.
-# Khi release, Git tag phải khớp với version này (ví dụ: CARAMOS_VERSION=1.0.1 → tag v1.0.1).
-CARAMOS_VERSION_MAJOR=1
-CARAMOS_VERSION_MINOR=0
-CARAMOS_VERSION_PATCH=1
-CARAMOS_VERSION_EXTRA=""
-CARAMOS_CODENAME="Open Beta"
-CARAMOS_VERSION="${CARAMOS_VERSION_MAJOR}.${CARAMOS_VERSION_MINOR}.${CARAMOS_VERSION_PATCH}${CARAMOS_VERSION_EXTRA}"
+# SenOS version — source of truth, giống cách Linux kernel khai báo trong Makefile.
+# Khi release, Git tag phải khớp với version này (ví dụ: SENOS_VERSION=1.0.1 → tag v1.0.1).
+SENOS_VERSION_MAJOR=1
+SENOS_VERSION_MINOR=0
+SENOS_VERSION_PATCH=1
+SENOS_VERSION_EXTRA=""
+SENOS_CODENAME="Open Beta"
+SENOS_VERSION="${SENOS_VERSION_MAJOR}.${SENOS_VERSION_MINOR}.${SENOS_VERSION_PATCH}${SENOS_VERSION_EXTRA}"
 
-OUTPUT_ISO="CaramOS-${CARAMOS_VERSION}-${MINT_EDITION}-amd64.iso"
+OUTPUT_ISO="SenOS-${SENOS_VERSION}-${MINT_EDITION}-amd64.iso"
 WORK_DIR="./build"
 # Nén mặc định: lz4 (nhanh cho dev). --release sẽ đổi sang xz (nhỏ, nén lâu)
 SQUASHFS_COMP="lz4"

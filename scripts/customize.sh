@@ -21,7 +21,7 @@ step_customize() {
     cleanup_chroot_package_state
 
     # --- Tuỳ biến ---
-    info "[5/7] Tuỳ biến CaramOS..."
+    info "[5/7] Tuỳ biến SenOS..."
 
     # Cài thêm packages
     if [ -f "$SCRIPT_DIR/config/packages.txt" ]; then
@@ -52,7 +52,7 @@ step_customize() {
             hook_name=$(basename "$hook")
             info "  → Chạy hook: $hook_name"
             cp "$hook" "$WORK_DIR/squashfs/tmp/$hook_name"
-            CARAMOS_VERSION="$CARAMOS_VERSION" \
+            SENOS_VERSION="$SENOS_VERSION" \
             MINT_VERSION="$MINT_VERSION" \
             MINT_EDITION="$MINT_EDITION" \
             chroot "$WORK_DIR/squashfs" /bin/bash "/tmp/$hook_name"
@@ -67,13 +67,13 @@ step_customize() {
     chroot "$WORK_DIR/squashfs" /bin/bash -c '
         set -e
         test -f /etc/dconf/db/local
-        test -f /etc/xdg/autostart/caramos-theme.desktop
+        test -f /etc/xdg/autostart/senos-theme.desktop
         test -f /etc/systemd/zram-generator.conf
         grep -q "^zram-size = ram / 2$" /etc/systemd/zram-generator.conf
         test -d /usr/share/cinnamon/applets/Cinnamenu@json
         find /usr/share/cinnamon/applets/Cinnamenu@json -name settings-schema.json -print -quit | grep -q .
-        test -f /usr/share/plymouth/themes/caramos/caramos.plymouth
-        date -u +"%Y-%m-%dT%H:%M:%SZ" > /etc/caramos-customized
+        test -f /usr/share/plymouth/themes/senos/senos.plymouth
+        date -u +"%Y-%m-%dT%H:%M:%SZ" > /etc/senos-customized
     '
     ok "Rootfs đã được customize đầy đủ."
 

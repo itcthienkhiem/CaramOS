@@ -66,7 +66,7 @@ step_repack_iso() {
         -as mkisofs
         -iso-level 3
         -full-iso9660-filenames
-        -volid "CaramOS"
+        -volid "SenOS"
     )
 
     # BIOS boot: isolinux (Mint) hoặc GRUB

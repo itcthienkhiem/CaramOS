@@ -1,6 +1,6 @@
 # Build artifacts
 build/
-CaramOS-*.iso
+*.iso
 *.log
 
 # OS files
@@ -9,3 +9,22 @@ Thumbs.db
 
 # Mint ISO (large file, don't commit)
 linuxmint-*.iso
+SenOS-*-v*.iso
+
+# Local VMware VM files (server/host info — do not commit)
+Ubuntu 64-bit*
+*.vmdk
+*.vmx
+*.vmxf
+*.vmsd
+*.nvram
+*.scoreboard
+
+# Claude Code tooling / local config
+.claude/
+
+# Downloaded Windows app payloads (large binaries)
+_winapps_tmp/
+
+# Source tarballs
+*.tar.gz

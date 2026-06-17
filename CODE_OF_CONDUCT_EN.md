@@ -1,8 +1,8 @@
-# Code of Conduct — CaramOS
+# Code of Conduct — SenOS
 
 ## Our Pledge
 
-CaramOS is an open-source project by the [Vietnam Linux Family (VNLF)](https://vietnamlinuxfamily.net) community. We are committed to creating an open, friendly, and respectful environment for everyone, regardless of experience, gender, gender identity, sexual orientation, disability, appearance, race, ethnicity, age, religion, or nationality.
+SenOS is an open-source project by the [Vietnam Linux Family (VNLF)](https://vietnamlinuxfamily.net) community. We are committed to creating an open, friendly, and respectful environment for everyone, regardless of experience, gender, gender identity, sexual orientation, disability, appearance, race, ethnicity, age, religion, or nationality.
 
 > [Tiếng Việt](CODE_OF_CONDUCT.md)
 
@@ -28,11 +28,11 @@ CaramOS is an open-source project by the [Vietnam Linux Family (VNLF)](https://v
 
 ## Scope
 
-This Code of Conduct applies in all project spaces: GitHub (Issues, Pull Requests, Discussions), chat channels, events, and anywhere a member represents the CaramOS project.
+This Code of Conduct applies in all project spaces: GitHub (Issues, Pull Requests, Discussions), chat channels, events, and anywhere a member represents the SenOS project.
 
 ## Enforcement
 
-Violations may be reported via [Issues](https://github.com/VN-Linux-Family/CaramOS/issues) or by contacting the project maintainers directly. All reports will be reviewed and handled appropriately.
+Violations may be reported via [Issues](https://github.com/VN-Linux-Family/SenOS/issues) or by contacting the project maintainers directly. All reports will be reviewed and handled appropriately.
 
 Project maintainers have the right to remove, edit, or reject comments, commits, code, issues, and other contributions that do not align with this Code of Conduct.
 
@@ -43,6 +43,6 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 ---
 
 <p align="center">
-  <strong>CaramOS</strong> — Sweet & Simple Linux<br>
-  <a href="https://github.com/VN-Linux-Family/CaramOS">github.com/VN-Linux-Family/CaramOS</a>
+  <strong>SenOS</strong> — Sweet & Simple Linux<br>
+  <a href="https://github.com/VN-Linux-Family/SenOS">github.com/VN-Linux-Family/SenOS</a>
 </p>

@@ -1,48 +1,48 @@
 .PHONY: build release clean clean-work clean-cache prepare boot-only overlay customize-only shell repack iso-only quick debug-iso docker-build docker-release docker-clean help
 
 build:
-	@echo "CaramOS Build — Dev mode (lz4, nhanh)"
+	@echo "SenOS Build — Dev mode (lz4, nhanh)"
 	sudo ./build.sh $(ISO)
 
 release:
-	@echo "CaramOS Build — Release mode (xz, nhỏ)"
+	@echo "SenOS Build — Release mode (xz, nhỏ)"
 	sudo ./build.sh --release $(ISO)
 
 prepare:
-	@echo "CaramOS Prepare — tạo work tree để sửa/test nhanh"
+	@echo "SenOS Prepare — tạo work tree để sửa/test nhanh"
 	sudo ./build.sh --prepare $(ISO)
 
 boot-only:
-	@echo "CaramOS Boot Config — chỉ áp dụng boot branding/debug"
+	@echo "SenOS Boot Config — chỉ áp dụng boot branding/debug"
 	sudo ./build.sh --boot-only $(ISO)
 
 overlay:
-	@echo "CaramOS Overlay — copy includes.chroot vào rootfs"
+	@echo "SenOS Overlay — copy includes.chroot vào rootfs"
 	sudo ./build.sh --overlay-only $(ISO)
 
 customize-only:
-	@echo "CaramOS Customize — chạy packages + overlay + hooks"
+	@echo "SenOS Customize — chạy packages + overlay + hooks"
 	sudo ./build.sh --customize-only $(ISO)
 
 shell:
-	@echo "CaramOS Shell — vào chroot build/squashfs"
+	@echo "SenOS Shell — vào chroot build/squashfs"
 	sudo ./build.sh --shell $(ISO)
 
 repack:
-	@echo "CaramOS Repack — tạo lại squashfs + ISO, giữ work tree"
+	@echo "SenOS Repack — tạo lại squashfs + ISO, giữ work tree"
 	sudo ./build.sh --repack-only $(ISO)
 
 iso-only:
-	@echo "CaramOS ISO Only — chỉ tạo lại ISO từ build/custom"
+	@echo "SenOS ISO Only — chỉ tạo lại ISO từ build/custom"
 	sudo ./build.sh --iso-only $(ISO)
 
 quick:
-	@echo "CaramOS Quick — prepare nếu cần, overlay + repack"
+	@echo "SenOS Quick — prepare nếu cần, overlay + repack"
 	sudo ./build.sh --quick $(ISO)
 
 debug-iso:
-	@echo "CaramOS Debug ISO — kiểm tra boot menu/Plymouth"
-	bash ./scripts/debug_iso.sh $(or $(ISO),CaramOS-0.1-cinnamon-amd64.iso)
+	@echo "SenOS Debug ISO — kiểm tra boot menu/Plymouth"
+	bash ./scripts/debug_iso.sh $(or $(ISO),SenOS-0.1-cinnamon-amd64.iso)
 
 clean:
 	sudo ./build.sh --clean
@@ -54,7 +54,7 @@ clean-cache:
 	sudo ./build.sh --clean-cache
 
 help:
-	@echo "CaramOS Build System (ISO Remaster)"
+	@echo "SenOS Build System (ISO Remaster)"
 	@echo ""
 	@echo "--- Local Build (Chỉ Ubuntu/Mint/Debian) ---"
 	@echo "  make build                — Full dev build (lz4), giống hành vi cũ"
@@ -76,7 +76,7 @@ help:
 	@echo "  make debug-iso            — In trạng thái boot menu/Plymouth để debug"
 	@echo ""
 	@echo "Workflow nhanh: make build/customize-only lần đầu → test ISO → sửa config/includes.chroot → make quick"
-	@echo "Lưu ý: make quick sẽ tự chạy customize nếu work tree chưa có marker /etc/caramos-customized"
+	@echo "Lưu ý: make quick sẽ tự chạy customize nếu work tree chưa có marker /etc/senos-customized"
 	@echo ""
 	@echo "--- Docker Build (Mọi distro/macOS/Windows) ---"
 	@echo "  make docker-build         — Dev build trong Docker"
@@ -88,13 +88,13 @@ help:
 	@echo "  make [target] ISO=file.iso — Build từ ISO có sẵn"
 
 docker-build:
-	@echo "CaramOS Build — Docker Dev mode (lz4, nhanh)"
+	@echo "SenOS Build — Docker Dev mode (lz4, nhanh)"
 	docker compose run --rm builder sudo ./build.sh $(ISO)
 
 docker-release:
-	@echo "CaramOS Build — Docker Release mode (xz, nhỏ)"
+	@echo "SenOS Build — Docker Release mode (xz, nhỏ)"
 	docker compose run --rm builder sudo ./build.sh --release $(ISO)
 
 docker-clean:
-	@echo "CaramOS Build — Docker Clean dọn dẹp"
+	@echo "SenOS Build — Docker Clean dọn dẹp"
 	docker compose run --rm builder sudo ./build.sh --clean
