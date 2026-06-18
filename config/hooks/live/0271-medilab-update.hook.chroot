@@ -1,0 +1,74 @@
+#!/bin/bash
+# Hook: tạo công cụ tự cập nhật Medilab qua Wine.
+# Medilab (Advanced Installer) hỗ trợ AI_INST_MAJORUPGRADE -> chạy Setup.exe bản mới
+# sẽ TỰ gỡ bản cũ + cài bản mới. Script này tải Setup.exe mới nhất rồi chạy.
+echo "[SenOS] === Tạo công cụ cập nhật Medilab ==="
+
+# File cấu hình URL bản cài mới nhất (admin có thể sửa trỏ về server AKSOFT)
+mkdir -p /etc/medilab
+cat > /etc/medilab/update.conf <<'CONF'
+# URL tới bộ cài Medilab MỚI NHẤT (Setup.exe). Đổi khi có nguồn cập nhật chính thức.
+MEDILAB_SETUP_URL="https://www.dropbox.com/scl/fi/ul285bcvklwuxmp18cpup/Setup.exe?rlkey=mmh3tot6w7br40cni8kkwvovu&dl=1"
+# (Tuỳ chọn) URL trả về số phiên bản mới nhất (text) để so sánh trước khi tải.
+MEDILAB_VERSION_URL=""
+CONF
+
+# Script cập nhật
+cat > /usr/local/bin/medilab-update <<'UPDATE'
+#!/bin/bash
+# Cập nhật Medilab: tải Setup.exe mới nhất + chạy qua Wine (tự gỡ cũ + cài mới).
+set -u
+export WINEPREFIX="$HOME/.local/share/medilab/wine"
+export WINEDEBUG=-all
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+CONF=/etc/medilab/update.conf
+[ -f "$CONF" ] && . "$CONF"
+: "${MEDILAB_SETUP_URL:=}"
+if [ -z "$MEDILAB_SETUP_URL" ]; then
+    echo "Chưa cấu hình MEDILAB_SETUP_URL trong /etc/medilab/update.conf"; exit 1
+fi
+
+DL="$HOME/.cache/medilab"; mkdir -p "$DL"
+echo "==== Cập nhật Medilab ===="
+echo "[1/3] Tải bộ cài mới nhất..."
+if ! wget -q --show-progress -O "$DL/Setup.exe" "$MEDILAB_SETUP_URL"; then
+    echo "Lỗi tải bộ cài. Kiểm tra mạng / URL."; exit 1
+fi
+
+# Prefix chưa có -> cài mới hẳn
+if [ ! -d "$WINEPREFIX" ] || ! find "$WINEPREFIX/drive_c" -iname 'Medilab.exe' >/dev/null 2>&1; then
+    echo "[2/3] Chưa cài Medilab -> cài lần đầu..."
+    /usr/local/bin/medilab-install || true
+fi
+
+echo "[2/3] Đóng Medilab đang chạy (nếu có)..."
+WINEPREFIX="$WINEPREFIX" wineserver -k 2>/dev/null || true
+pkill -f 'Medilab.exe' 2>/dev/null || true; sleep 2
+
+echo "[3/3] Cài bản mới (Advanced Installer tự gỡ bản cũ + cài mới)..."
+# /quiet để cập nhật im lặng; bỏ /quiet nếu muốn thấy giao diện cài.
+wine "$DL/Setup.exe" AI_INST_MAJORUPGRADE=1 /quiet /norestart 2>/dev/null \
+    || wine "$DL/Setup.exe" /quiet /norestart 2>/dev/null \
+    || wine "$DL/Setup.exe" 2>/dev/null || true
+
+echo "==== Hoàn tất cập nhật Medilab ===="
+command -v notify-send >/dev/null 2>&1 && notify-send "Medilab" "Đã cập nhật xong." || true
+read -p "Nhấn Enter để đóng..." _ 2>/dev/null || true
+UPDATE
+chmod 755 /usr/local/bin/medilab-update
+
+# Launcher trong menu
+cat > /usr/share/applications/medilab-update.desktop <<'DESK'
+[Desktop Entry]
+Type=Application
+Name=Cập nhật Medilab
+Comment=Tải và cài bản Medilab mới nhất (qua Wine)
+Exec=/usr/local/bin/medilab-update
+Icon=senos-logo
+Terminal=true
+Categories=System;Office;
+DESK
+
+echo "[OK] medilab-update + launcher + /etc/medilab/update.conf đã tạo."
